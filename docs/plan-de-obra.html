@@ -289,6 +289,8 @@ h1.lettering {
 .n-dot    { fill: var(--paper); stroke: var(--ink-900); stroke-width: 1.5; }
 .n-dot-r  { fill: var(--fire); stroke: var(--fire); stroke-width: 1.5; }
 .n-dot-c  { fill: var(--copper); stroke: var(--copper); stroke-width: 1.5; }
+.n-dot-d  { fill: var(--teal); stroke: var(--teal); stroke-width: 1.5; }
+.n-done   { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--teal); letter-spacing: 0.07em; }
 .n-num    { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--ink-900); }
 .n-num-i  { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--paper); }
 .n-lab    { font-family: var(--mono); font-size: 11px; fill: var(--ink-600); letter-spacing: 0.03em; }
@@ -375,6 +377,30 @@ h1.lettering {
 .chip--gate  { color: var(--fire);   background: var(--fire-soft); }
 .chip--must  { color: var(--copper); background: var(--copper-soft); }
 .chip--wait  { color: var(--ink-600); background: transparent; }
+.chip--done  { color: var(--teal); background: var(--teal-soft); }
+
+/* Fase cerrada: el nodo se rellena y el bloque baja de intensidad, para que el
+   ojo aterrice en lo que queda por hacer. */
+.phase--done::before { border-color: var(--teal); background: var(--teal); }
+.phase--done .phase__num { color: var(--teal); }
+.veredicto {
+  border: var(--w-bold) solid var(--teal);
+  background: var(--teal-soft);
+  padding: 14px 18px;
+  max-width: 80ch;
+  margin-bottom: 20px;
+}
+.veredicto__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--teal);
+  display: block;
+  margin-bottom: 8px;
+}
+.veredicto p { margin: 0; font-size: 0.9375rem; }
 
 .phase__lede {
   margin: 0 0 20px;
@@ -587,7 +613,8 @@ tbody tr:hover td { background: var(--paper-alt); }
       <div class="cell"><span class="cell__k">Mundo visual</span><span class="cell__v">PLANO AS-BUILT<br>seed 1e3dade5</span></div>
       <div class="cell"><span class="cell__k">Norma</span><span class="cell__v">NFPA 10 · NTP 350.043</span></div>
       <div class="cell"><span class="cell__k">Fases</span><span class="cell__v">12 · 8 SIN DEPENDENCIAS</span></div>
-      <div class="cell"><span class="cell__k">Revisión</span><span class="cell__v">REV. 1 · 26.09.2026</span></div>
+      <div class="cell"><span class="cell__k">Avance</span><span class="cell__v">F0 · F1 CERRADAS</span></div>
+      <div class="cell"><span class="cell__k">Revisión</span><span class="cell__v">REV. 2 · 26.09.2026</span></div>
     </div>
   </header>
 
@@ -606,8 +633,7 @@ tbody tr:hover td { background: var(--paper-alt); }
     <div class="route__head">
       <span class="route__title">Ruta crítica</span>
       <span class="route__legend">
-        <span><i class="swatch swatch--ok"></i>sin dependencias</span>
-        <span><i class="swatch swatch--risk"></i>punto de riesgo</span>
+        <span><i class="swatch swatch--ok"></i>cerrada</span>
         <span><i class="swatch swatch--gate"></i>espera hosting</span>
       </span>
     </div>
@@ -624,13 +650,13 @@ tbody tr:hover td { background: var(--paper-alt); }
         <line class="n-line" x1="758" y1="52" x2="810" y2="52" />
 
         <!-- marca de riesgo en F1 -->
-        <line class="n-gate" x1="130" y1="52" x2="130" y2="92" />
-        <text class="n-flag" x="130" y="108" text-anchor="middle">RIESGO</text>
+        <line class="n-line" x1="130" y1="52" x2="130" y2="92" />
+        <text class="n-done" x="130" y="108" text-anchor="middle">APROBADA</text>
 
         <!-- nodos -->
         <g>
-          <circle class="n-dot-c" cx="50"  cy="52" r="13" /><text class="n-num-i" x="50"  y="56" text-anchor="middle">00</text>
-          <circle class="n-dot-r" cx="130" cy="52" r="13" /><text class="n-num-i" x="130" y="56" text-anchor="middle">01</text>
+          <circle class="n-dot-d" cx="50"  cy="52" r="13" /><text class="n-num-i" x="50"  y="56" text-anchor="middle">00</text>
+          <circle class="n-dot-d" cx="130" cy="52" r="13" /><text class="n-num-i" x="130" y="56" text-anchor="middle">01</text>
           <circle class="n-dot"   cx="210" cy="52" r="13" /><text class="n-num"   x="210" y="56" text-anchor="middle">02</text>
           <circle class="n-dot"   cx="290" cy="52" r="13" /><text class="n-num"   x="290" y="56" text-anchor="middle">03</text>
           <circle class="n-dot"   cx="370" cy="52" r="13" /><text class="n-num"   x="370" y="56" text-anchor="middle">04</text>
@@ -667,11 +693,11 @@ tbody tr:hover td { background: var(--paper-alt); }
   <div class="phases">
 
     <!-- F0 -->
-    <section class="phase">
+    <section class="phase phase--done">
       <div class="phase__head">
         <span class="phase__num mono">00</span>
         <h2 class="lettering phase__name">Andamiaje y tokens</h2>
-        <span class="chip chip--ok">sin dependencias</span>
+        <span class="chip chip--done">cerrada · 26.09.2026</span>
       </div>
       <p class="phase__lede">Sin trabajo visual. Solo que el terreno exista y que el build salga.</p>
       <ul class="tasks">
@@ -690,13 +716,18 @@ tbody tr:hover td { background: var(--paper-alt); }
     </section>
 
     <!-- F1 -->
-    <section class="phase phase--risk">
+    <section class="phase phase--done">
       <div class="phase__head">
         <span class="phase__num mono">01</span>
         <h2 class="lettering phase__name">La lámina</h2>
-        <span class="chip chip--risk">punto de riesgo del proyecto</span>
+        <span class="chip chip--done">cerrada · 26.09.2026</span>
       </div>
-      <p class="phase__lede">El activo clave. Se hace aislado, antes de construir nada alrededor.</p>
+      <p class="phase__lede">El activo clave. Se hizo aislado, antes de construir nada alrededor.</p>
+
+      <div class="veredicto">
+        <span class="veredicto__label">Veredicto de la compuerta</span>
+        <p><strong>«Sí se lee como un plano.»</strong> Aprobada por el cliente. Era la compuerta más dura del proyecto: si el dibujo no se leía como un plano técnico creíble, la dirección visual no se sostenía y había que rehacerla acá, con una página de costo.</p>
+      </div>
       <ul class="tasks">
         <li><span>1.1</span><span>Dibujar la <span class="u-hi">isometría de la red contra incendio</span> en SVG: montante, gabinete, hidrante, extintor, detector, bomba, cámara y casco — los 8 ramales colgando de una sola montante</span></li>
         <li><span>1.2</span><span>Aplicar los tres grosores: <code>0,5 px / ink-300</code> retícula y auxiliares · <code>1 px / ink-600</code> separadores y contornos · <code>2 px / ink-900</code> elemento activo. <span class="u-hi">El grosor es la jerarquía</span></span></li>

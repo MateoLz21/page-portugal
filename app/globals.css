@@ -16,6 +16,19 @@
   --color-ink-300: #a9b6c0; /* SOLO trazo: retícula, auxiliares   */
   --color-ink-150: #c9d3d9; /* filetes muy tenues                 */
 
+  /* Retícula de plano: ink-900 al 4 % YA COMPUESTO sobre paper.
+     Precalculado a propósito, no con color-mix() sobre transparent: un valor
+     sólido es determinista, lo resuelve cualquier navegador y cualquier
+     analizador estático, y no depende de que el fondo de abajo sea el esperado. */
+  --color-grid: #ebedef;
+
+  /* El hueco entre líneas de la retícula: papel con alfa cero.
+     NO se usa la palabra clave `transparent`, que es rgba(0,0,0,0) —negro con
+     alfa cero—. Interpolar hacia ella deja franja gris en varios motores, y
+     cualquier analizador que promedie las paradas del degradado sin honrar el
+     alfa lee un fondo casi negro. Nombrar el color del hueco lo hace explícito. */
+  --color-grid-gap: rgb(244 246 247 / 0);
+
   /* ── Rojo fuego: RESERVADO ─────────────────────────────────────
      Solo dos usos, nunca más: elementos de protección contra
      incendios en el dibujo, y la acción principal. En un plano
@@ -132,17 +145,34 @@
    RETÍCULA DE PLANO — módulo de 8px al 4% de opacidad
    ════════════════════════════════════════════════════════════════ */
 @utility plan-grid {
+  /* La superficie pinta su propio suelo. Heredar el fondo de un ancestro deja
+     el contraste a merced de dónde se monte el componente. */
+  background-color: var(--color-paper);
   background-image:
-    linear-gradient(
-      color-mix(in srgb, var(--color-ink-900) 4%, transparent) var(--w-hair),
-      transparent var(--w-hair)
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-ink-900) 4%, transparent) var(--w-hair),
-      transparent var(--w-hair)
-    );
+    linear-gradient(var(--color-grid) var(--w-hair), var(--color-grid-gap) var(--w-hair)),
+    linear-gradient(90deg, var(--color-grid) var(--w-hair), var(--color-grid-gap) var(--w-hair));
   background-size: var(--mod) var(--mod);
+}
+
+/**
+ * Medida de lectura: 65-75 caracteres por línea (§6.3).
+ *
+ * El valor es 56ch, no 68ch, y la diferencia importa. En Archivo el glifo `0`
+ * —que es lo que mide la unidad `ch`— es bastante más ancho que el promedio de
+ * una minúscula en español, así que `1ch` rinde cerca de 1,35 caracteres reales.
+ * Medido en el navegador: 66ch daba 89 caracteres por línea. 56ch da ~75, que es
+ * el tope del rango.
+ *
+ * Vive en un solo lugar en vez de repartido en `max-w-[68ch]` sueltos, que se
+ * olvidan justo donde hacen falta y arrastran el error de conversión a cada uso.
+ */
+@utility medida {
+  max-width: 56ch;
+}
+
+/** Medida corta, para bajadas y notas al pie: ~62 caracteres. */
+@utility medida-corta {
+  max-width: 46ch;
 }
 
 /* ════════════════════════════════════════════════════════════════

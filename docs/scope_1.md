@@ -334,7 +334,7 @@ const mono = JetBrains_Mono({
 ```
 
 - **Escala:** H1 `clamp(2.25rem, 5vw, 3.75rem)` · H2 `2rem` · H3 `1.375rem` · cuerpo `1rem/1.7`.
-- **Medida de lectura:** 65–75 caracteres por línea en párrafos (`max-w-[68ch]`). El _tracking_ nunca baja de `-0.04em`.
+- **Medida de lectura:** 65–75 caracteres por línea en párrafos. Se aplica con la utilidad `medida` (`max-width: 56ch`), **no con `68ch`**: en Archivo el glifo `0` —que es lo que mide la unidad `ch`— es más ancho que el promedio de una minúscula en español, así que `1ch` rinde cerca de 1,35 caracteres reales. Medido en el navegador: `66ch` daba 89 caracteres por línea. El _tracking_ nunca baja de `-0.04em`.
 - **Carga:** `next/font/google` descarga y autoaloja las fuentes en el build, así que funciona con exportación estática y sin llamadas a Google en runtime. Solo se incrustan los pesos y ejes usados.
 
 ### 6.4 Logo
@@ -432,6 +432,8 @@ En su lugar, la profundidad es la de una lámina técnica: **jerarquía de groso
 ### 7.1 Intro: "el plano se incendia y el extintor lo redibuja"
 
 > **Reescrita en v1.3** para vivir dentro del mundo elegido. La versión de v1.1 era fuego fotorrealista sobre una foto de fondo; ahora el fuego y el extintor son del mismo mundo que el resto del sitio. El guion y la duración no cambian. **Sale más barata**, porque un dibujo de línea no necesita el shader de ruido fBm que exigía el fuego realista.
+
+> 📐 **Storyboard entregado:** los 4 fotogramas para aprobación del cliente están en `docs/storyboard-intro.html`, renderizados desde la geometría real de la lámina con el modelo de calor de `lib/intro.ts`. No son una ilustración del efecto: son el efecto congelado.
 
 **Guion (duración total ≤ 3 s):**
 

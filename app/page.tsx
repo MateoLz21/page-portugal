@@ -1,58 +1,93 @@
-import { cifras, empresa, telefonoLegible } from '@/content/empresa'
+import { Fotograma } from '@/components/plan/Fotograma'
+import { Lamina, LaminaResponsive, Leyenda } from '@/components/plan/Lamina'
+import { nombresSimbolos, Simbolo } from '@/components/plan/simbolos'
+import { construirRed, servicios, type SimboloId } from '@/content/red'
+import { empresa } from '@/content/empresa'
 
 /**
- * FASE 0 — hoja de verificación del andamiaje.
+ * FASE 1 — hoja de verificación de la lámina.
  *
- * Esta página NO es la portada. Existe para cerrar la compuerta de la Fase 0:
- * demuestra que los tokens de §6.2 resuelven, que Archivo carga con su eje de
- * ancho y con acentos, que la mono tiene numerales tabulares, y que las tres
- * utilidades de grosor y la retícula funcionan.
+ * Existe para cerrar la compuerta de la Fase 1, que es la más dura del proyecto:
+ * el dibujo tiene que leerse como un plano técnico creíble, no como decoración.
+ * Si alguien del oficio reconoce la simbología, pasa.
  *
- * La portada real se construye en la Fase 3, sobre la lámina isométrica de la
- * Fase 1. Este archivo se reemplaza entonces.
+ * No es la portada. Esa se construye en la Fase 3, sobre esta misma lámina.
  */
 
-const tintas = [
-  { token: 'paper', hex: '#F4F6F7', uso: 'fondo base — papel de plano' },
-  { token: 'paper-alt', hex: '#E9EDEF', uso: 'sección alterna, celda de tabla' },
-  { token: 'ink-900', hex: '#16212B', uso: 'títulos, cuerpo, línea de 2px' },
-  { token: 'ink-600', hex: '#465562', uso: 'texto secundario, cotas, línea 1px' },
-  { token: 'ink-300', hex: '#A9B6C0', uso: 'solo trazo: retícula y auxiliares' },
-  { token: 'fire-600', hex: '#C62828', uso: 'RESERVADO: contra incendios + acción' },
-  { token: 'copper-500', hex: '#B8733A', uso: 'solo anotación: revisión, foco' },
-  { token: 'teal-600', hex: '#1F7F80', uso: 'ramal de agua del dibujo' },
+/** Los 8 terminales de servicio, más los 2 equipos del tronco. */
+const SIMBOLOS_TRONCO: readonly SimboloId[] = ['bomba', 'valvula']
+
+/**
+ * Los 4 fotogramas del storyboard de la intro (§7.1). Los instantes están
+ * elegidos para mostrar cada tramo del guion, no repartidos por igual.
+ */
+const FOTOGRAMAS = [
+  {
+    t: 0.6,
+    titulo: 'Los bordes se encienden',
+    tramo: '0 – 0,8 s',
+    nota: 'El hairline azul se pone incandescente y vira a rojo hacia dentro, como papel que se prende por el canto. El dibujo sigue legible: se está quemando, no desapareciendo.',
+  },
+  {
+    t: 1.2,
+    titulo: 'Entra el extintor',
+    tramo: '0,8 – 1,4 s',
+    nota: 'Entra desde la izquierda dibujado en el mismo hairline que el resto: es un símbolo del plano, no un objeto ajeno. Pequeño rebote, se inclina, la manguera apunta al centro.',
+  },
+  {
+    t: 2.0,
+    titulo: 'La descarga redibuja',
+    tramo: '1,4 – 2,4 s',
+    nota: 'El chorro barre en abanico y por donde pasa las líneas vuelven a su azul frío. No se apaga un fuego: se redibuja el plano. Mirá la mitad izquierda, ya recuperada.',
+  },
+  {
+    t: 3.0,
+    titulo: 'La lámina queda limpia',
+    tramo: '2,4 – 3,0 s',
+    nota: 'La niebla cubre y se disipa. Queda la lámina fría y completa, y el extintor se convierte en el símbolo del ramal rojo del hero: el único elemento rojo que queda, que además es el enlace a recarga.',
+  },
 ]
 
-const grosores = [
-  { clase: 'rule-b-hair', peso: '0,5px', tinta: 'ink-300', uso: 'retícula, auxiliares' },
-  { clase: 'rule-b-line', peso: '1px', tinta: 'ink-600', uso: 'separadores, contornos' },
-  { clase: 'rule-b-bold', peso: '2px', tinta: 'ink-900', uso: 'activo, contorno principal' },
+/** Los anchos que el alcance fija en §11 como objetivo responsive. */
+const BREAKPOINTS = [
+  { ancho: 360, nombre: 'Móvil', layout: 'alta' as const, nota: 'Diagrama de montante' },
+  { ancho: 768, nombre: 'Tableta', layout: 'ancha' as const, nota: 'Isometría de red' },
+  { ancho: 1024, nombre: 'Escritorio', layout: 'ancha' as const, nota: 'Isometría de red' },
+  { ancho: 1440, nombre: 'Amplio', layout: 'ancha' as const, nota: 'Isometría de red' },
 ]
 
-export default function VerificacionFase0() {
+export default function VerificacionFase1() {
+  const ancha = construirRed('ancha', 'viva')
+  const alta = construirRed('alta', 'viva')
+
+  const segmentosAncha = ancha.tubos.length
+  const segmentosAlta = alta.tubos.length
+
   return (
-    <main className="plan-grid min-h-screen px-6 py-12 sm:px-10">
-      <div className="mx-auto max-w-5xl">
+    <main className="plan-grid min-h-screen px-5 py-12 sm:px-8">
+      <div className="mx-auto max-w-6xl">
         {/* ── Cuadro de rótulo ─────────────────────────────────── */}
         <header className="rule-bold bg-paper p-6 sm:p-8">
           <h1 className="lettering text-h1">
-            Fase 0<br />
-            Verificación
+            Fase 1<br />
+            La lámina
           </h1>
-          <p className="mt-4 max-w-[60ch] text-ink-600">
-            Andamiaje del sitio de {empresa.nombreComercial}. Esta hoja comprueba que los tokens,
-            las fuentes y las utilidades de grosor resuelven. No es la portada: esa se construye en
-            la Fase 3, sobre la lámina de la Fase 1.
+          <p className="mt-4 medida text-ink-600">
+            La red contra incendio de {empresa.marcaCorta}: montante, colector, anillo de retorno y
+            ocho ramales, uno por línea de servicio. El ramal de extintores es lo único en rojo, y
+            es la entrada de la audiencia primaria.
           </p>
 
-          <dl className="rule-t-hair mt-6 grid gap-x-8 gap-y-3 pt-5 sm:grid-cols-3">
+          <dl className="rule-t-hair mt-6 grid gap-x-8 gap-y-3 pt-5 sm:grid-cols-3 lg:grid-cols-4">
             {[
-              ['Razón social', empresa.razonSocial],
-              ['RUC', empresa.ruc],
-              ['Teléfono', telefonoLegible(empresa.telefonos[0] ?? '')],
-              ['Dominio', empresa.dominio],
-              ['Normativa', 'NFPA 10 · NTP 350.043'],
-              ['Revisión', 'F0 · 26.09.2026'],
+              ['Proyección', 'Isométrica · 30°'],
+              ['Grosores', '0,5 / 1 / 2 px'],
+              ['Segmentos', `${segmentosAncha} anchos · ${segmentosAlta} altos`],
+              ['Símbolos', '10 normados'],
+              ['Norma', 'NFPA 10 · NTP 350.043'],
+              ['Sombras', 'Ninguna'],
+              ['Radio de esquina', '0'],
+              ['Revisión', 'F1 · 26.09.2026'],
             ].map(([k, v]) => (
               <div key={k}>
                 <dt className="datum text-[11px] uppercase tracking-[0.13em] text-ink-600">{k}</dt>
@@ -62,71 +97,101 @@ export default function VerificacionFase0() {
           </dl>
         </header>
 
-        {/* ── Tipografía ───────────────────────────────────────── */}
+        {/* ── La lámina, viva ──────────────────────────────────── */}
         <section className="mt-14">
-          <h2 className="lettering rule-b-bold pb-3 text-h3">Tipografía</h2>
+          <h2 className="lettering rule-b-bold pb-3 text-h3">La lámina</h2>
+          <p className="mt-4 medida text-ink-600">
+            Cambiá el ancho de la ventana: por debajo de 768 px el dibujo no se encoge, cambia de
+            artefacto. La isometría de red pasa a diagrama de montante, que es otro documento real
+            del mismo oficio y es vertical por naturaleza.
+          </p>
+          <div className="rule-line mt-6 bg-paper p-4 sm:p-8">
+            <LaminaResponsive instancia="viva" />
 
-          <div className="mt-6 grid gap-8 lg:grid-cols-2">
-            <div>
-              <p className="datum mb-3 text-[11px] uppercase tracking-[0.13em] text-ink-600">
-                Archivo · eje wdth 118 · rotulación
+            <div className="rule-t-bold mt-8 pt-5">
+              <p className="datum mb-2 text-[11px] tracking-[0.13em] text-ink-600 uppercase">
+                Leyenda
               </p>
-              <p className="lettering text-h2">Inspección y recarga de extintores</p>
-              <p className="datum mt-3 text-[12.5px] text-ink-600">
-                Acentos: á é í ó ú ñ Ñ ¿ ¡ ü — subconjunto latin-ext cargado
-              </p>
+              <Leyenda />
             </div>
-
-            <div>
-              <p className="datum mb-3 text-[11px] uppercase tracking-[0.13em] text-ink-600">
-                Archivo · eje wdth 100 · cuerpo
-              </p>
-              <p className="max-w-[66ch]">
-                Contamos con los equipos, las herramientas y las unidades móviles necesarias para
-                transportar a nuestro personal, equipos y materiales dentro de operaciones mineras e
-                industriales.
-              </p>
-            </div>
-          </div>
-
-          <div className="rule-t-hair mt-8 pt-5">
-            <p className="datum mb-3 text-[11px] uppercase tracking-[0.13em] text-ink-600">
-              JetBrains Mono · numerales tabulares · solo medición real
-            </p>
-            <table className="datum w-full max-w-lg text-[12.5px]">
-              <tbody>
-                {[
-                  ['Extintor PQS', '6 kg', 'NTP 350.043'],
-                  ['Extintor CO₂', '10 lb', 'NFPA 10'],
-                  ['Prueba hidrostática', '5 años', 'NFPA 10 §8.3'],
-                ].map(([a, b, c]) => (
-                  <tr key={a} className="rule-b-hair">
-                    <td className="py-2 pr-6 font-sans">{a}</td>
-                    <td className="py-2 pr-6 text-right tabular-nums">{b}</td>
-                    <td className="py-2 text-ink-600">{c}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </section>
 
-        {/* ── Paleta ───────────────────────────────────────────── */}
+        {/* ── Los 4 breakpoints ────────────────────────────────── */}
         <section className="mt-14">
-          <h2 className="lettering rule-b-bold pb-3 text-h3">Tintas</h2>
-          <ul className="mt-6 grid gap-px sm:grid-cols-2">
-            {tintas.map((t) => (
-              <li key={t.token} className="rule-hair flex items-stretch gap-4 bg-paper p-3">
+          <h2 className="lettering rule-b-bold pb-3 text-h3">Los cuatro anchos</h2>
+          <p className="mt-4 medida text-ink-600">
+            Cada caja monta su layout de forma explícita. Las clases responsive miran el viewport,
+            no el contenedor, así que sin esto una caja de 360 px en una pantalla ancha mostraría la
+            isometría y la verificación sería falsa.
+          </p>
+
+          <div className="mt-8 space-y-10">
+            {BREAKPOINTS.map((bp) => (
+              <figure key={bp.ancho}>
+                <figcaption className="rule-b-line flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 pb-2">
+                  <span className="lettering text-[13px]">
+                    {bp.nombre} · {bp.ancho} px
+                  </span>
+                  <span className="datum text-[12.5px] text-ink-600">{bp.nota}</span>
+                </figcaption>
+
+                {/* overflow-x-auto: a 1440 la caja no debe empujar la página */}
+                <div className="mt-4 overflow-x-auto">
+                  <div
+                    className="rule-hair bg-paper p-4"
+                    style={{ width: bp.ancho, maxWidth: '100%' }}
+                  >
+                    <Lamina layout={bp.layout} instancia={`bp${bp.ancho}`} />
+                  </div>
+                </div>
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Los símbolos ─────────────────────────────────────── */}
+        <section className="mt-14">
+          <h2 className="lettering rule-b-bold pb-3 text-h3">Símbolos normados</h2>
+          <p className="mt-4 medida text-ink-600">
+            Ocho terminales de servicio más los dos equipos del tronco. Derivados de la simbología
+            real del oficio —el símbolo P&amp;ID de bomba centrífuga, la mariposa de una válvula de
+            compuerta, el hidrante de pilar con sus dos salidas—, no de una librería de iconos.
+          </p>
+
+          <ul className="mt-8 grid grid-cols-2 gap-px sm:grid-cols-4 lg:grid-cols-5">
+            {servicios.map((s) => (
+              <li key={s.slug} className="rule-hair flex flex-col gap-3 bg-paper p-4">
                 <span
+                  className={s.tinta === 'fire' ? 'text-fire-600' : 'text-ink-900'}
                   aria-hidden="true"
-                  className="rule-line w-12 shrink-0"
-                  style={{ backgroundColor: t.hex }}
-                />
-                <span className="min-w-0">
-                  <span className="datum block text-[12.5px] font-medium">{t.token}</span>
-                  <span className="datum block text-[11px] text-ink-600">{t.hex}</span>
-                  <span className="mt-0.5 block text-[13px] leading-snug text-ink-600">
-                    {t.uso}
+                >
+                  <Simbolo id={s.simbolo} tamano={44} decorativo />
+                </span>
+                <span>
+                  <span className="datum block text-[11px] text-ink-600">{s.n}</span>
+                  <span className="lettering block text-[12.5px] leading-tight">
+                    {nombresSimbolos[s.simbolo]}
+                  </span>
+                  <span className="mt-1 block text-[12px] leading-snug text-ink-600">
+                    {s.nombre}
+                  </span>
+                </span>
+              </li>
+            ))}
+
+            {SIMBOLOS_TRONCO.map((id) => (
+              <li key={id} className="rule-hair flex flex-col gap-3 bg-paper-alt p-4">
+                <span className="text-ink-900" aria-hidden="true">
+                  <Simbolo id={id} tamano={44} decorativo />
+                </span>
+                <span>
+                  <span className="datum block text-[11px] text-ink-600">tronco</span>
+                  <span className="lettering block text-[12.5px] leading-tight">
+                    {nombresSimbolos[id]}
+                  </span>
+                  <span className="mt-1 block text-[12px] leading-snug text-ink-600">
+                    Equipo de la red, no es un ramal
                   </span>
                 </span>
               </li>
@@ -134,71 +199,97 @@ export default function VerificacionFase0() {
           </ul>
         </section>
 
-        {/* ── Grosores ─────────────────────────────────────────── */}
+        {/* ── Storyboard de la intro ───────────────────────────── */}
         <section className="mt-14">
-          <h2 className="lettering rule-b-bold pb-3 text-h3">Grosores de línea</h2>
-          <p className="mt-4 max-w-[66ch] text-ink-600">
-            El sistema de profundidad completo. No hay sombras: la jerarquía es el grosor. Existen
-            tres utilidades y solo tres, para que no se pueda inventar un cuarto peso.
+          <h2 className="lettering rule-b-bold pb-3 text-h3">Storyboard de la intro</h2>
+          <p className="medida mt-4 text-ink-600">
+            Los cuatro fotogramas del guion de §7.1, renderizados desde la geometría real de la
+            lámina. No son una ilustración del efecto: son el efecto congelado. El mismo modelo de
+            calor que va a mover la animación de la Fase 6 decide acá el color de cada segmento, así
+            que esto también prueba que el enfoque es viable antes de comprometerse con él.
           </p>
-          <ul className="mt-6">
-            {grosores.map((g) => (
-              <li key={g.clase} className={`${g.clase} flex flex-wrap items-baseline gap-x-6 py-4`}>
-                <span className="datum w-40 text-[12.5px] font-medium">{g.clase}</span>
-                <span className="datum w-16 text-[12.5px] text-ink-600">{g.peso}</span>
-                <span className="datum w-24 text-[12.5px] text-ink-600">{g.tinta}</span>
-                <span className="text-[13px] text-ink-600">{g.uso}</span>
-              </li>
+
+          <div className="mt-8 space-y-10">
+            {FOTOGRAMAS.map((f) => (
+              <figure key={f.t}>
+                <figcaption className="rule-b-line flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 pb-2">
+                  <span className="flex flex-wrap items-baseline gap-x-3">
+                    <span className="datum text-[12.5px] text-ink-600">{f.tramo}</span>
+                    <span className="lettering text-[13px]">{f.titulo}</span>
+                  </span>
+                  <span className="datum text-[12.5px] text-ink-600">t = {f.t.toFixed(1)} s</span>
+                </figcaption>
+                <div className="rule-hair mt-4 bg-paper p-4">
+                  <Fotograma t={f.t} instancia={`sb${String(f.t).replace('.', '')}`} />
+                </div>
+                <p className="medida mt-3 text-[13px] leading-snug text-ink-600">{f.nota}</p>
+              </figure>
             ))}
-          </ul>
+          </div>
+
+          <div className="rule-bold mt-10 bg-paper p-5">
+            <p className="datum mb-2 text-[11px] tracking-[0.13em] text-ink-600 uppercase">
+              Por qué sale más barato
+            </p>
+            <p className="medida text-[13px] leading-snug text-ink-600">
+              Desaparece el shader GLSL de fuego con ruido fBm, que era el ítem más caro del
+              presupuesto de 40 KB y el más difícil de hacer bien. El calor se aplica interpolando
+              el color del trazo de los segmentos SVG que el hero ya carga. Sin WebGL, sin{' '}
+              <code className="datum text-[12.5px]">ogl</code>, sin respaldo de{' '}
+              <code className="datum text-[12.5px]">feTurbulence</code>. Y baja el riesgo
+              fotosensible solo: la superficie roja simultánea de unas líneas es una fracción de la
+              de un fuego lleno.
+            </p>
+          </div>
         </section>
 
-        {/* ── Cifras ───────────────────────────────────────────── */}
+        {/* ── Segmentos direccionables ─────────────────────────── */}
         <section className="mt-14">
-          <h2 className="lettering rule-b-bold pb-3 text-h3">Cifras verificables</h2>
-          <p className="mt-4 max-w-[66ch] text-ink-600">
-            Las cuatro se derivan del contenido documentado. En la Fase 3 van como banda tipográfica
-            con filetes, nunca como fila de tarjetas con número grande.
+          <h2 className="lettering rule-b-bold pb-3 text-h3">Segmentos direccionables</h2>
+          <p className="mt-4 medida text-ink-600">
+            La Fase 6 interpola el <code className="datum text-[13px]">stroke</code> de cada
+            segmento para que el plano se incendie y se vuelva a dibujar. Por eso cada tubo lleva su{' '}
+            <code className="datum text-[13px]">id</code> estable y sus{' '}
+            <code className="datum text-[13px]">data-*</code>: sin esto, animarlo sería imposible y
+            habría que rehacer el SVG.
           </p>
-          <ul className="mt-6 grid gap-px sm:grid-cols-2 lg:grid-cols-4">
-            {cifras.map((c) => (
-              <li key={c.etiqueta} className="rule-t-line pt-4">
-                <span className="lettering block text-[2.25rem] leading-none text-ink-900">
-                  {c.valor}
-                </span>
-                <span className="mt-2 block text-[14px] leading-snug">{c.etiqueta}</span>
-                <span className="datum mt-2 block text-[11px] leading-snug text-ink-600">
-                  {c.fuente}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
 
-        {/* ── El rojo reservado ────────────────────────────────── */}
-        <section className="mt-14">
-          <h2 className="lettering rule-b-bold pb-3 text-h3">El rojo reservado</h2>
-          <p className="mt-4 max-w-[66ch] text-ink-600">
-            Dos usos, nunca más: elementos de protección contra incendios en el dibujo, y la acción
-            principal. En un plano as-built real la contra incendios se dibuja en rojo, así que esto
-            es convención técnica y no acento corporativo.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <a
-              href="/cotizar/"
-              className="lettering inline-block bg-fire-600 px-6 py-3 text-[14px] text-paper transition-colors hover:bg-fire-700"
-            >
-              Solicitar cotización
-            </a>
-            <span className="datum text-[12.5px] text-ink-600">
-              única acción en rojo por encuadre
-            </span>
+          <div className="mt-6 overflow-x-auto">
+            <table className="w-full min-w-[34rem] text-[13px]">
+              <thead>
+                <tr>
+                  {['id', 'ramal', 'peso', 'tinta', 'vértices'].map((h) => (
+                    <th
+                      key={h}
+                      className="rule-b-line datum pr-6 pb-2.5 text-left text-[11px] font-bold tracking-[0.13em] text-ink-600 uppercase"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {ancha.tubos.map((t) => (
+                  <tr key={t.id} className="rule-b-hair">
+                    <td className="datum py-2 pr-6 text-[12.5px]">{t.id}</td>
+                    <td className="py-2 pr-6 text-ink-600">{t.ramal ?? '—'}</td>
+                    <td className="datum py-2 pr-6 text-[12.5px] text-ink-600">{t.peso}</td>
+                    <td className="datum py-2 pr-6 text-[12.5px] text-ink-600">{t.tinta}</td>
+                    <td className="datum py-2 text-right text-[12.5px] tabular-nums text-ink-600">
+                      {t.puntos.length}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
 
         <footer className="rule-t-bold mt-16 pt-5">
-          <p className="datum text-[12.5px] text-ink-600">
-            {empresa.marcaCorta} · Fase 0 · andamiaje verificado · 26.09.2026
+          <p className="datum medida text-[12.5px] text-ink-600">
+            {empresa.marcaCorta} · Fase 1 · los enlaces de cada ramal apuntan a{' '}
+            <code className="text-[12.5px]">/servicios/[slug]/</code>, que se construye en la Fase 4
+            · 26.09.2026
           </p>
         </footer>
       </div>

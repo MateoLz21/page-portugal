@@ -1,0 +1,147 @@
+/**
+ * Proyección isométrica para la lámina as-built.
+ *
+ * Por qué existe este módulo: las posiciones de la red se declaran en unidades
+ * de grilla `(x, y, z)` —este, norte, arriba— y se proyectan acá. Coordenadas
+ * SVG escritas a mano no se pueden mover, ni razonar, ni probar.
+ *
+ * Proyección isométrica clásica: los ejes horizontales caen a 30° y el eje
+ * vertical se mantiene vertical.
+ *
+ *        z
+ *        │
+ *        │
+ *       ╱ ╲
+ *      y   x     x crece hacia la derecha-abajo, y hacia la izquierda-abajo
+ *
+ * Todas las funciones son puras y sin dependencias: se pueden probar sin DOM.
+ */
+
+/** cos(30°) — proyección horizontal de los ejes x e y. */
+export const ISO_COS = Math.cos(Math.PI / 6)
+
+/** sin(30°) — proyección vertical de los ejes x e y. */
+export const ISO_SIN = Math.sin(Math.PI / 6)
+
+/** Punto en el espacio de la red, en unidades de grilla. */
+export type Punto3D = readonly [x: number, y: number, z: number]
+
+/** Punto proyectado, en unidades de usuario del SVG. */
+export type Punto2D = readonly [x: number, y: number]
+
+/**
+ * Proyecta un punto de la grilla al plano del dibujo.
+ *
+ * @param punto  posición en unidades de grilla
+ * @param unidad tamaño de una unidad de grilla, en unidades de usuario del SVG
+ */
+export function proyectar(punto: Punto3D, unidad: number): Punto2D {
+  const [x, y, z] = punto
+  return [(x - y) * ISO_COS * unidad, ((x + y) * ISO_SIN - z) * unidad]
+}
+
+/**
+ * Profundidad aparente de un punto: cuánto "hacia el observador" está.
+ *
+ * En esta proyección un mayor (x + y) cae más abajo en pantalla, o sea más
+ * cerca. Se usa para ordenar el dibujo de atrás hacia adelante, que es lo que
+ * permite que un elemento del frente interrumpa la línea del que está detrás.
+ */
+export function profundidad(punto: Punto3D): number {
+  const [x, y] = punto
+  return x + y
+}
+
+/**
+ * Convierte una polilínea de la grilla en un atributo `d` de SVG.
+ *
+ * Devuelve `null` cuando hay menos de dos puntos: un tubo de un solo punto no
+ * es un tubo, y devolver `null` obliga a quien llama a decidir qué hacer en vez
+ * de emitir un `<path d="">` inválido y silencioso.
+ */
+export function trazo(puntos: readonly Punto3D[], unidad: number): string | null {
+  if (puntos.length < 2) return null
+
+  return puntos
+    .map((punto, i) => {
+      const [px, py] = proyectar(punto, unidad)
+      return `${i === 0 ? 'M' : 'L'}${redondear(px)} ${redondear(py)}`
+    })
+    .join(' ')
+}
+
+/**
+ * Caja que contiene una lista de puntos ya proyectados, con margen.
+ * Sirve para calcular el `viewBox` a partir de la geometría real, en vez de
+ * ajustarlo a ojo cada vez que se mueve un ramal.
+ */
+export function caja(
+  puntos: readonly Punto3D[],
+  unidad: number,
+  margen: number,
+): { x: number; y: number; ancho: number; alto: number; viewBox: string } {
+  if (puntos.length === 0) {
+    return { x: 0, y: 0, ancho: 0, alto: 0, viewBox: '0 0 0 0' }
+  }
+
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+
+  for (const punto of puntos) {
+    const [px, py] = proyectar(punto, unidad)
+    if (px < minX) minX = px
+    if (px > maxX) maxX = px
+    if (py < minY) minY = py
+    if (py > maxY) maxY = py
+  }
+
+  const x = redondear(minX - margen)
+  const y = redondear(minY - margen)
+  const ancho = redondear(maxX - minX + margen * 2)
+  const alto = redondear(maxY - minY + margen * 2)
+
+  return { x, y, ancho, alto, viewBox: `${x} ${y} ${ancho} ${alto}` }
+}
+
+/**
+ * Redondea a dos decimales. Un SVG con quince decimales por coordenada pesa
+ * de más y no se lee en el diff.
+ */
+export function redondear(n: number): number {
+  return Math.round(n * 100) / 100
+}
+
+/**
+ * Caja que contiene puntos ya proyectados y, si hacen falta, rectángulos
+ * adicionales. Existe porque los rótulos del dibujo se salen del encuadre de la
+ * tubería: el `viewBox` tiene que contener las dos cosas.
+ */
+export function cajaDe2D(
+  puntos: readonly Punto2D[],
+  margen: number,
+): { x: number; y: number; ancho: number; alto: number; viewBox: string } {
+  if (puntos.length === 0) {
+    return { x: 0, y: 0, ancho: 0, alto: 0, viewBox: '0 0 0 0' }
+  }
+
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+
+  for (const [px, py] of puntos) {
+    if (px < minX) minX = px
+    if (px > maxX) maxX = px
+    if (py < minY) minY = py
+    if (py > maxY) maxY = py
+  }
+
+  const x = redondear(minX - margen)
+  const y = redondear(minY - margen)
+  const ancho = redondear(maxX - minX + margen * 2)
+  const alto = redondear(maxY - minY + margen * 2)
+
+  return { x, y, ancho, alto, viewBox: `${x} ${y} ${ancho} ${alto}` }
+}
