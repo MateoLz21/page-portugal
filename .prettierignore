@@ -1,0 +1,16 @@
+# Código de terceros. El skill impeccable y su motor leen estos archivos;
+# reformatearlos es modificar una dependencia vendorizada.
+.claude/
+.impeccable/
+
+# Generado
+node_modules/
+out/
+.next/
+package-lock.json
+next-env.d.ts
+
+# Documentación del proyecto: markdown escrito a mano, con tablas alineadas
+# y saltos deliberados. Prettier los reflowea y pelea con la autoría.
+docs/
+PRODUCT.md

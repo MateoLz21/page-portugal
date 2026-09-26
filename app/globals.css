@@ -1,0 +1,221 @@
+@import 'tailwindcss';
+
+/* ════════════════════════════════════════════════════════════════
+   TOKENS — mundo visual "Plano As-Built"
+   Fuente: docs/scope_1.md §6.2 · contrato: .impeccable/surfaces/app-page-tsx.md
+   ════════════════════════════════════════════════════════════════ */
+@theme {
+  /* ── Fondos: papel de plano, blanco frío azulado ───────────── */
+  --color-paper: #f4f6f7;
+  --color-paper-alt: #e9edef;
+  --color-paper-sunk: #dfe5e8;
+
+  /* ── Tinta: la escala que carga toda la jerarquía ──────────── */
+  --color-ink-900: #16212b; /* títulos, cuerpo, línea de 2px      */
+  --color-ink-600: #465562; /* texto secundario, cotas, línea 1px */
+  --color-ink-300: #a9b6c0; /* SOLO trazo: retícula, auxiliares   */
+  --color-ink-150: #c9d3d9; /* filetes muy tenues                 */
+
+  /* ── Rojo fuego: RESERVADO ─────────────────────────────────────
+     Solo dos usos, nunca más: elementos de protección contra
+     incendios en el dibujo, y la acción principal. En un plano
+     as-built real la contra incendios se dibuja en rojo, así que
+     esto es convención técnica, no acento corporativo.          */
+  --color-fire-600: #c62828;
+  --color-fire-700: #a11d1d;
+  --color-fire-50: #fbeaea;
+
+  /* ── Cobre: SOLO anotación ─────────────────────────────────────
+     Sellos de revisión, marcas de aprobación, anillo de foco.
+     Viene del logo, así que es compromiso de marca — pero acá
+     tiene función, no es decoración.                            */
+  --color-copper-500: #b8733a;
+  --color-copper-50: #f6ede5;
+
+  /* ── Verde agua: el ramal de agua del dibujo ───────────────────
+     Redes húmedas e hidrantes. Tomado de la gota del logo.      */
+  --color-teal-600: #1f7f80;
+  --color-teal-50: #e6f0f0;
+
+  /* ── Estados de formulario ────────────────────────────────── */
+  --color-ok-600: #2e7d32;
+  --color-err-600: #c62828;
+
+  /* ── Tipografía ───────────────────────────────────────────────
+     Una sola familia variable (Archivo) cubre display y cuerpo
+     usando el eje de ancho. Mono solo para medición real.       */
+  --font-sans: var(--font-archivo), 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ── Escala tipográfica (§6.3) ─────────────────────────────── */
+  --text-h1: clamp(2.25rem, 5vw, 3.75rem);
+  --text-h1--line-height: 1.04;
+  --text-h2: 2rem;
+  --text-h2--line-height: 1.12;
+  --text-h3: 1.375rem;
+  --text-h3--line-height: 1.25;
+
+  /* ── Radio de esquina: uno solo ────────────────────────────────
+     Un plano no tiene esquinas redondeadas. La única excepción
+     documentada es el botón de WhatsApp, que es circular porque
+     es un objeto ajeno a la lámina.                             */
+  --radius-none: 0;
+  --radius-whatsapp: 9999px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   GROSORES DE LÍNEA — el sistema de profundidad completo
+   No hay sombras. La jerarquía ES el grosor (§6.6). Estas
+   utilidades existen para que no se pueda inventar un cuarto peso:
+   si la única forma de dibujar una línea es una de estas tres,
+   el sistema se mantiene solo.
+   ════════════════════════════════════════════════════════════════ */
+@theme {
+  --w-hair: 0.5px;
+  --w-line: 1px;
+  --w-bold: 2px;
+  --mod: 8px; /* módulo de la retícula de plano */
+}
+
+/* hair — 0,5px / ink-300 · retícula y líneas auxiliares */
+@utility rule-hair {
+  border: var(--w-hair) solid var(--color-ink-300);
+}
+@utility rule-t-hair {
+  border-top: var(--w-hair) solid var(--color-ink-300);
+}
+@utility rule-b-hair {
+  border-bottom: var(--w-hair) solid var(--color-ink-300);
+}
+@utility rule-l-hair {
+  border-left: var(--w-hair) solid var(--color-ink-300);
+}
+@utility rule-r-hair {
+  border-right: var(--w-hair) solid var(--color-ink-300);
+}
+
+/* line — 1px / ink-600 · separadores y contornos de componente */
+@utility rule-line {
+  border: var(--w-line) solid var(--color-ink-600);
+}
+@utility rule-t-line {
+  border-top: var(--w-line) solid var(--color-ink-600);
+}
+@utility rule-b-line {
+  border-bottom: var(--w-line) solid var(--color-ink-600);
+}
+@utility rule-l-line {
+  border-left: var(--w-line) solid var(--color-ink-600);
+}
+@utility rule-r-line {
+  border-right: var(--w-line) solid var(--color-ink-600);
+}
+
+/* bold — 2px / ink-900 · elemento activo o contorno principal */
+@utility rule-bold {
+  border: var(--w-bold) solid var(--color-ink-900);
+}
+@utility rule-t-bold {
+  border-top: var(--w-bold) solid var(--color-ink-900);
+}
+@utility rule-b-bold {
+  border-bottom: var(--w-bold) solid var(--color-ink-900);
+}
+@utility rule-l-bold {
+  border-left: var(--w-bold) solid var(--color-ink-900);
+}
+@utility rule-r-bold {
+  border-right: var(--w-bold) solid var(--color-ink-900);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RETÍCULA DE PLANO — módulo de 8px al 4% de opacidad
+   ════════════════════════════════════════════════════════════════ */
+@utility plan-grid {
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--color-ink-900) 4%, transparent) var(--w-hair),
+      transparent var(--w-hair)
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-ink-900) 4%, transparent) var(--w-hair),
+      transparent var(--w-hair)
+    );
+  background-size: var(--mod) var(--mod);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   ROTULACIÓN — Archivo en su ancho expandido, como lettering de
+   plano. El eje wdth de la fuente variable hace el trabajo.
+   ════════════════════════════════════════════════════════════════ */
+@utility lettering {
+  font-family: var(--font-sans);
+  font-variation-settings: 'wdth' 118;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-wrap: balance;
+}
+
+/* Cota / dato técnico: mono con numerales tabulares */
+@utility datum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BASE
+   El sitio es de un solo tema (claro). El modo oscuro está fuera
+   de alcance (§6.6), así que se declara color-scheme explícito
+   para que los controles nativos del navegador no aparezcan
+   oscuros en un equipo configurado así.
+   ════════════════════════════════════════════════════════════════ */
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    font-variation-settings: 'wdth' 100;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Superficies del navegador: se tematizan desde la paleta en la
+     Fase 2. Acá va solo lo que no puede esperar. */
+  ::selection {
+    background-color: var(--color-copper-500);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: var(--w-bold) solid var(--color-copper-500);
+    outline-offset: 2px;
+  }
+
+  /* Tablas técnicas y cualquier columna de dígitos */
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

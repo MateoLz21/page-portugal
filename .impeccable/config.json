@@ -1,0 +1,15 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": ["docs/plan-de-obra.html"],
+        "createdAt": "2026-09-26T18:33:10.280Z",
+        "reason": "Claude determino falso positivo por cruce de temas; ningun par reportado puede coexistir. Evidencia verificada en el archivo: #000000 y #ffffff no se declaran en ninguna linea (son el default sin resolver de var()); #16212B es --ink-900 (texto) en :root linea 15 pero --paper-alt (fondo) solo en los bloques oscuros lineas 42 y 60, y el detector confunde los dos roles del mismo hex; #93A6B3 y #DCE6EC existen unicamente dentro de :root[data-theme=dark] y del media query, lineas 44-45 y 62-63. Pares reales medidos a mano, todos AA: claro #16212B sobre #F4F6F7 = 13:1, #465562 sobre #F4F6F7 = 7.2:1; oscuro #DCE6EC sobre #101820 = 13:1, #93A6B3 sobre #101820 = 6.5:1. Antes de esto se corrigio un fallo real que el detector NO reporto: ink-300 #A9B6C0 usado como color de texto daba 1.93:1 en 7 lugares, movidos a ink-600. Acotado a este unico archivo, que es un documento entregable, no codigo de la app."
+      }
+    ]
+  }
+}

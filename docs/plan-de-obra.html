@@ -1,0 +1,981 @@
+<title>Plan de Obra Portugal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..800;1,62..125,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+/* ============================================================
+   TOKENS — tomados de docs/scope_1.md §6.2 (sistema del proyecto)
+   Estado base = tema claro completo.
+   ============================================================ */
+:root {
+  --paper:      #F4F6F7;
+  --paper-alt:  #E9EDEF;
+  --paper-sunk: #DFE5E8;
+  --ink-900:    #16212B;
+  --ink-600:    #465562;
+  --ink-300:    #A9B6C0;
+  --ink-150:    #C9D3D9;
+  --fire:       #C62828;
+  --fire-soft:  #FBEAEA;
+  --copper:     #B8733A;
+  --copper-soft:#F6EDE5;
+  --teal:       #1F7F80;
+  --teal-soft:  #E6F0F0;
+  --grid:       rgba(22, 33, 43, 0.045);
+
+  --w-hair: 0.5px;
+  --w-line: 1px;
+  --w-bold: 2px;
+
+  --mod: 8px;
+  --measure: 66ch;
+
+  --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+/* Sistema: el tema oscuro es el negativo del plano. Solo se redefinen tokens. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:      #101820;
+    --paper-alt:  #16212B;
+    --paper-sunk: #0A1016;
+    --ink-900:    #DCE6EC;
+    --ink-600:    #93A6B3;
+    --ink-300:    #4A5C69;
+    --ink-150:    #2A3742;
+    --fire:       #FF6B5E;
+    --fire-soft:  #2A1614;
+    --copper:     #D9A06A;
+    --copper-soft:#241A12;
+    --teal:       #4FB3B4;
+    --teal-soft:  #0E1F20;
+    --grid:       rgba(220, 230, 236, 0.045);
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper:      #101820;
+  --paper-alt:  #16212B;
+  --paper-sunk: #0A1016;
+  --ink-900:    #DCE6EC;
+  --ink-600:    #93A6B3;
+  --ink-300:    #4A5C69;
+  --ink-150:    #2A3742;
+  --fire:       #FF6B5E;
+  --fire-soft:  #2A1614;
+  --copper:     #D9A06A;
+  --copper-soft:#241A12;
+  --teal:       #4FB3B4;
+  --teal-soft:  #0E1F20;
+  --grid:       rgba(220, 230, 236, 0.045);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) var(--w-hair), transparent var(--w-hair)),
+    linear-gradient(90deg, var(--grid) var(--w-hair), transparent var(--w-hair));
+  background-size: var(--mod) var(--mod);
+  color: var(--ink-900);
+  font-family: var(--sans);
+  font-variation-settings: "wdth" 100;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--copper); color: var(--paper); }
+
+:focus-visible {
+  outline: var(--w-bold) solid var(--copper);
+  outline-offset: 3px;
+}
+
+a { color: inherit; }
+
+.sheet {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 56px) clamp(16px, 4vw, 48px) 96px;
+}
+
+/* ============================================================
+   ROTULACIÓN — Archivo expandido, como lettering de plano
+   ============================================================ */
+.lettering {
+  font-variation-settings: "wdth" 118;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   CUADRO DE RÓTULO
+   ============================================================ */
+.titleblock {
+  border: var(--w-bold) solid var(--ink-900);
+  background: var(--paper);
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.titleblock__main {
+  padding: clamp(18px, 3vw, 32px);
+  border-bottom: var(--w-line) solid var(--ink-150);
+}
+
+h1.lettering {
+  font-size: clamp(1.75rem, 4.6vw, 3.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+}
+
+.titleblock__sub {
+  margin: 14px 0 0;
+  max-width: 60ch;
+  color: var(--ink-600);
+  font-size: 1.0625rem;
+}
+
+.titleblock__cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.cell {
+  padding: 12px clamp(14px, 2vw, 20px);
+  border-right: var(--w-line) solid var(--ink-150);
+  border-top: 0;
+}
+.cell:last-child { border-right: 0; }
+
+.cell__k {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-600);
+  margin-bottom: 4px;
+}
+
+.cell__v {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-900);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   NOTA DE LÁMINA — los principios de secuencia
+   ============================================================ */
+.note {
+  margin-top: 40px;
+  border-left: var(--w-bold) solid var(--copper);
+  padding-left: clamp(16px, 2.5vw, 26px);
+}
+
+.note__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--copper);
+  display: block;
+  margin-bottom: 12px;
+}
+
+.note ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 16px;
+  counter-reset: note;
+}
+
+.note li {
+  counter-increment: note;
+  display: grid;
+  grid-template-columns: 2.4em 1fr;
+  gap: 4px;
+  max-width: var(--measure);
+  color: var(--ink-600);
+}
+
+.note li::before {
+  content: counter(note) ".";
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-600);
+  padding-top: 0.28em;
+}
+
+.note strong { color: var(--ink-900); font-weight: 600; }
+
+/* ============================================================
+   RUTA CRÍTICA — el esquema dibujado
+   ============================================================ */
+.route {
+  margin-top: 56px;
+  border: var(--w-line) solid var(--ink-150);
+  background: var(--paper-alt);
+}
+
+.route__head {
+  padding: 15px 20px;
+  border-bottom: var(--w-line) solid var(--ink-150);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  align-items: baseline;
+}
+
+.route__title {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-900);
+}
+
+.route__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-600);
+}
+
+.route__legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border: var(--w-line) solid currentColor;
+}
+.swatch--risk { color: var(--fire); background: var(--fire); }
+.swatch--gate { color: var(--fire); background: transparent; }
+.swatch--ok   { color: var(--teal); background: var(--teal); }
+
+.route__scroll {
+  overflow-x: auto;
+  padding: 26px 20px 20px;
+}
+
+.route svg { display: block; min-width: 900px; width: 100%; height: auto; }
+
+.n-line   { stroke: var(--ink-300); stroke-width: 1; fill: none; }
+.n-line-b { stroke: var(--ink-900); stroke-width: 1.5; fill: none; }
+.n-gate   { stroke: var(--fire); stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+.n-dot    { fill: var(--paper); stroke: var(--ink-900); stroke-width: 1.5; }
+.n-dot-r  { fill: var(--fire); stroke: var(--fire); stroke-width: 1.5; }
+.n-dot-c  { fill: var(--copper); stroke: var(--copper); stroke-width: 1.5; }
+.n-num    { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--ink-900); }
+.n-num-i  { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--paper); }
+.n-lab    { font-family: var(--mono); font-size: 11px; fill: var(--ink-600); letter-spacing: 0.03em; }
+.n-flag   { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--fire); letter-spacing: 0.07em; }
+
+/* ============================================================
+   FASES — cuelgan de la montante
+   ============================================================ */
+.phases {
+  margin-top: 64px;
+  position: relative;
+  padding-left: clamp(0px, 3vw, 34px);
+}
+
+.phase {
+  position: relative;
+  padding: 30px 0 34px clamp(46px, 7vw, 82px);
+  border-left: var(--w-line) solid var(--ink-150);
+}
+
+.phase:last-child { border-left-color: transparent; }
+
+/* el nodo sobre la montante */
+.phase::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--w-line) * -1 - 4px);
+  top: 38px;
+  width: 9px;
+  height: 9px;
+  background: var(--paper);
+  border: var(--w-bold) solid var(--ink-900);
+}
+
+/* el ramal horizontal hacia el título */
+.phase::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 42px;
+  width: clamp(26px, 5vw, 56px);
+  height: 0;
+  border-top: var(--w-line) solid var(--ink-150);
+}
+
+.phase--risk::before   { border-color: var(--fire); background: var(--fire); }
+.phase--gate::before   { border-color: var(--fire); background: var(--paper); }
+.phase--must::before   { border-color: var(--copper); background: var(--copper); }
+
+.phase__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  margin-bottom: 6px;
+}
+
+.phase__num {
+  font-family: var(--mono);
+  font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--copper);
+  font-variant-numeric: tabular-nums;
+}
+
+.phase__name {
+  font-size: clamp(1.0625rem, 2.3vw, 1.4rem);
+  line-height: 1.12;
+}
+
+.chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: var(--w-line) solid currentColor;
+  white-space: nowrap;
+}
+.chip--ok    { color: var(--teal);   background: var(--teal-soft); }
+.chip--risk  { color: var(--fire);   background: var(--fire-soft); }
+.chip--gate  { color: var(--fire);   background: var(--fire-soft); }
+.chip--must  { color: var(--copper); background: var(--copper-soft); }
+.chip--wait  { color: var(--ink-600); background: transparent; }
+
+.phase__lede {
+  margin: 0 0 20px;
+  max-width: var(--measure);
+  color: var(--ink-600);
+  font-size: 0.9375rem;
+  font-style: italic;
+}
+
+/* lista de tareas — leyenda de plano */
+.tasks {
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+  border-top: var(--w-line) solid var(--ink-150);
+}
+
+.tasks li {
+  display: grid;
+  grid-template-columns: 3.6em 1fr;
+  gap: 2px 12px;
+  padding: 9px 0;
+  border-bottom: var(--w-hair) solid var(--ink-150);
+  font-size: 0.9375rem;
+}
+
+.tasks li > span:first-child {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-600);
+  padding-top: 0.3em;
+  font-variant-numeric: tabular-nums;
+}
+
+.tasks li > span:last-child { max-width: 74ch; }
+
+.tasks code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+  background: var(--paper-sunk);
+  padding: 1px 4px;
+  color: var(--ink-900);
+}
+
+/* la compuerta — callout de especificación */
+.gate {
+  border: var(--w-line) solid var(--ink-900);
+  background: var(--paper);
+  padding: 18px 20px;
+  max-width: 80ch;
+}
+
+.gate--risk { border-color: var(--fire); border-width: var(--w-bold); }
+.gate--must { border-color: var(--copper); border-width: var(--w-bold); }
+
+.gate__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-600);
+  display: block;
+  margin-bottom: 9px;
+}
+.gate--risk .gate__label { color: var(--fire); }
+.gate--must .gate__label { color: var(--copper); }
+
+.gate p {
+  margin: 0;
+  font-size: 0.9375rem;
+  max-width: var(--measure);
+}
+.gate p + p { margin-top: 10px; }
+
+.gate strong { font-weight: 700; }
+
+.dep {
+  margin-top: 16px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-600);
+}
+.dep b { color: var(--ink-900); font-weight: 700; }
+
+/* ============================================================
+   TABLAS
+   ============================================================ */
+.block { margin-top: 72px; }
+
+h2.lettering {
+  font-size: clamp(1.25rem, 2.8vw, 1.65rem);
+  padding-bottom: 12px;
+  border-bottom: var(--w-bold) solid var(--ink-900);
+  margin-bottom: 8px;
+}
+
+.block__note {
+  margin: 0 0 24px;
+  color: var(--ink-600);
+  font-size: 0.9375rem;
+  max-width: var(--measure);
+}
+
+.tablewrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-600);
+  padding: 0 14px 10px 0;
+  border-bottom: var(--w-line) solid var(--ink-900);
+  white-space: nowrap;
+}
+
+td {
+  padding: 11px 14px 11px 0;
+  border-bottom: var(--w-hair) solid var(--ink-150);
+  vertical-align: top;
+}
+
+td:last-child, th:last-child { padding-right: 0; }
+
+tbody tr:hover td { background: var(--paper-alt); }
+
+.u-hi   { font-weight: 600; color: var(--ink-900); }
+.u-mono { font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
+.pri {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.pri--hi  { color: var(--fire); }
+.pri--mid { color: var(--copper); }
+.pri--lo  { color: var(--ink-600); }
+
+/* fuera de alcance */
+.out {
+  margin-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.out span {
+  font-size: 0.875rem;
+  color: var(--ink-600);
+  border: var(--w-hair) solid var(--ink-150);
+  padding: 5px 10px;
+}
+
+/* ============================================================
+   PIE — rótulo de cierre
+   ============================================================ */
+.foot {
+  margin-top: 80px;
+  border-top: var(--w-bold) solid var(--ink-900);
+  padding-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 30px;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+  color: var(--ink-600);
+}
+
+@media (max-width: 640px) {
+  .phases { padding-left: 0; }
+  .phase  { padding-left: 34px; }
+  .phase::after { width: 20px; }
+  .tasks li { grid-template-columns: 1fr; gap: 2px; }
+  .tasks li > span:first-child { padding-top: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+
+<main class="sheet">
+
+  <!-- ══════════════════ CUADRO DE RÓTULO ══════════════════ -->
+  <header class="titleblock">
+    <div class="titleblock__main">
+      <h1 class="lettering">Plan de obra<br>Sitio Portugal Seguridad</h1>
+      <p class="titleblock__sub">Ordenado por dependencia y riesgo, no por capítulo del alcance. Las fases 0 a 8 no necesitan ni una foto, ni un logo editable, ni un buzón de correo, ni el cPanel: el sitio se puede terminar completo antes de que llegue el hosting.</p>
+    </div>
+    <div class="titleblock__cells">
+      <div class="cell"><span class="cell__k">Cliente</span><span class="cell__v">PORTUGAL SEGURIDAD<br>INDUSTRIAL Y MINERA E.I.R.L.</span></div>
+      <div class="cell"><span class="cell__k">RUC</span><span class="cell__v">20600361172</span></div>
+      <div class="cell"><span class="cell__k">Dominio</span><span class="cell__v">cortaincendiosportugal.com</span></div>
+      <div class="cell"><span class="cell__k">Mundo visual</span><span class="cell__v">PLANO AS-BUILT<br>seed 1e3dade5</span></div>
+      <div class="cell"><span class="cell__k">Norma</span><span class="cell__v">NFPA 10 · NTP 350.043</span></div>
+      <div class="cell"><span class="cell__k">Fases</span><span class="cell__v">12 · 8 SIN DEPENDENCIAS</span></div>
+      <div class="cell"><span class="cell__k">Revisión</span><span class="cell__v">REV. 1 · 26.09.2026</span></div>
+    </div>
+  </header>
+
+  <!-- ══════════════════ NOTA: PRINCIPIO DE SECUENCIA ══════════════════ -->
+  <section class="note">
+    <span class="note__label">SECUENCIA</span>
+    <ol>
+      <li><span><strong>Lo que puede fallar primero, se hace primero.</strong> La lámina isométrica es el activo del que cuelga el mundo visual entero. Si no se lee como un plano técnico creíble, la dirección no se sostiene — y eso hay que descubrirlo en la Fase 1 con una sola página, no en la Fase 8 con once rutas construidas encima.</span></li>
+      <li><span><strong>Nada espera al cliente ni al hosting.</strong> Solo la Fase 9 depende de que exista el cPanel. Todo lo demás avanza con lo que ya hay documentado.</span></li>
+      <li><span><strong>Cada fase tiene una compuerta medible.</strong> No «quedó lindo»: un criterio que se verifica con el navegador, con Lighthouse o con un valor computado. Una fase sin su compuerta cerrada no habilita la siguiente.</span></li>
+    </ol>
+  </section>
+
+  <!-- ══════════════════ RUTA CRÍTICA ══════════════════ -->
+  <section class="route">
+    <div class="route__head">
+      <span class="route__title">Ruta crítica</span>
+      <span class="route__legend">
+        <span><i class="swatch swatch--ok"></i>sin dependencias</span>
+        <span><i class="swatch swatch--risk"></i>punto de riesgo</span>
+        <span><i class="swatch swatch--gate"></i>espera hosting</span>
+      </span>
+    </div>
+    <div class="route__scroll">
+      <svg viewBox="0 0 1140 182" role="img" aria-label="Esquema de ruta crítica: las fases 0 a 8 corren seguidas, una compuerta de espera por hosting, y después las fases 9 a 11.">
+        <!-- montante del build -->
+        <line class="n-line-b" x1="50" y1="52" x2="690" y2="52" />
+        <!-- tramo de despliegue -->
+        <line class="n-line-b" x1="810" y1="52" x2="970" y2="52" />
+        <!-- compuerta -->
+        <line class="n-gate" x1="750" y1="16" x2="750" y2="120" />
+        <text class="n-flag" x="750" y="136" text-anchor="middle">ESPERA HOSTING</text>
+        <line class="n-line" x1="690" y1="52" x2="742" y2="52" />
+        <line class="n-line" x1="758" y1="52" x2="810" y2="52" />
+
+        <!-- marca de riesgo en F1 -->
+        <line class="n-gate" x1="130" y1="52" x2="130" y2="92" />
+        <text class="n-flag" x="130" y="108" text-anchor="middle">RIESGO</text>
+
+        <!-- nodos -->
+        <g>
+          <circle class="n-dot-c" cx="50"  cy="52" r="13" /><text class="n-num-i" x="50"  y="56" text-anchor="middle">00</text>
+          <circle class="n-dot-r" cx="130" cy="52" r="13" /><text class="n-num-i" x="130" y="56" text-anchor="middle">01</text>
+          <circle class="n-dot"   cx="210" cy="52" r="13" /><text class="n-num"   x="210" y="56" text-anchor="middle">02</text>
+          <circle class="n-dot"   cx="290" cy="52" r="13" /><text class="n-num"   x="290" y="56" text-anchor="middle">03</text>
+          <circle class="n-dot"   cx="370" cy="52" r="13" /><text class="n-num"   x="370" y="56" text-anchor="middle">04</text>
+          <circle class="n-dot"   cx="450" cy="52" r="13" /><text class="n-num"   x="450" y="56" text-anchor="middle">05</text>
+          <circle class="n-dot"   cx="530" cy="52" r="13" /><text class="n-num"   x="530" y="56" text-anchor="middle">06</text>
+          <circle class="n-dot"   cx="610" cy="52" r="13" /><text class="n-num"   x="610" y="56" text-anchor="middle">07</text>
+          <circle class="n-dot-c" cx="690" cy="52" r="13" /><text class="n-num-i" x="690" y="56" text-anchor="middle">08</text>
+          <circle class="n-dot"   cx="810" cy="52" r="13" /><text class="n-num"   x="810" y="56" text-anchor="middle">09</text>
+          <circle class="n-dot"   cx="890" cy="52" r="13" /><text class="n-num"   x="890" y="56" text-anchor="middle">10</text>
+          <circle class="n-dot"   cx="970" cy="52" r="13" /><text class="n-num"   x="970" y="56" text-anchor="middle">11</text>
+        </g>
+
+        <!-- rotulación escalonada -->
+        <g>
+          <text class="n-lab" x="50"  y="26" text-anchor="middle">ANDAMIAJE</text>
+          <text class="n-lab" x="210" y="26" text-anchor="middle">COMPONENTES</text>
+          <text class="n-lab" x="370" y="26" text-anchor="middle">RUTAS</text>
+          <text class="n-lab" x="530" y="26" text-anchor="middle">INTRO</text>
+          <text class="n-lab" x="690" y="26" text-anchor="middle">CIERRE</text>
+          <text class="n-lab" x="890" y="26" text-anchor="middle">DESPLIEGUE</text>
+
+          <text class="n-lab" x="290" y="82" text-anchor="middle">PORTADA</text>
+          <text class="n-lab" x="450" y="82" text-anchor="middle">FORMULARIOS</text>
+          <text class="n-lab" x="610" y="82" text-anchor="middle">SEO</text>
+          <text class="n-lab" x="810" y="82" text-anchor="middle">PHP + CORREO</text>
+          <text class="n-lab" x="970" y="82" text-anchor="middle">ENTREGA</text>
+          <text class="n-lab" x="130" y="164" text-anchor="middle">LÁMINA</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══════════════════ FASES ══════════════════ -->
+  <div class="phases">
+
+    <!-- F0 -->
+    <section class="phase">
+      <div class="phase__head">
+        <span class="phase__num mono">00</span>
+        <h2 class="lettering phase__name">Andamiaje y tokens</h2>
+        <span class="chip chip--ok">sin dependencias</span>
+      </div>
+      <p class="phase__lede">Sin trabajo visual. Solo que el terreno exista y que el build salga.</p>
+      <ul class="tasks">
+        <li><span>0.1</span><span><code>package.json</code>, Next.js última estable, React, TypeScript, App Router</span></li>
+        <li><span>0.2</span><span><code>next.config.ts</code> con <code>output: 'export'</code>, <code>trailingSlash: true</code>, <code>images: { unoptimized: true }</code></span></li>
+        <li><span>0.3</span><span>Tailwind v4 con los tokens del alcance §6.2 en <code>@theme</code>: <code>paper</code>, <code>paper-alt</code>, <code>ink-900/600/300</code>, <code>fire-600/700</code>, <code>copper-500</code>, <code>teal-600</code></span></li>
+        <li><span>0.4</span><span><code>next/font/google</code>: <span class="u-hi">Archivo</span> variable con <code>axes: ['wdth']</code> y subconjuntos <code>latin</code> + <code>latin-ext</code> (los acentos del español), más <span class="u-hi">JetBrains Mono</span> en 400/500</span></li>
+        <li><span>0.5</span><span>Estructura de carpetas: <code>/app</code>, <code>/components/{ui,layout,motion,forms,plan}</code>, <code>/content</code>, <code>/public</code>, <code>/php</code></span></li>
+        <li><span>0.6</span><span>Stubs de <code>/content</code> con <span class="u-hi">todos los campos pendientes como opcionales</span>: <code>horario: null</code>, <code>redes: []</code>, <code>certificaciones: []</code></span></li>
+        <li><span>0.7</span><span>ESLint, Prettier, y los tres grosores de línea más la retícula de 8 px como utilidades</span></li>
+      </ul>
+      <div class="gate">
+        <span class="gate__label">Compuerta</span>
+        <p><code>npm run build</code> genera <code>/out</code>. Las fuentes quedan autoalojadas en el build — verificar que <strong>no hay petición a <code>fonts.googleapis.com</code> en runtime</strong>. Una página vacía renderiza con el fondo <code>paper</code> correcto. Cero errores en consola, cero avisos de ESLint.</p>
+      </div>
+    </section>
+
+    <!-- F1 -->
+    <section class="phase phase--risk">
+      <div class="phase__head">
+        <span class="phase__num mono">01</span>
+        <h2 class="lettering phase__name">La lámina</h2>
+        <span class="chip chip--risk">punto de riesgo del proyecto</span>
+      </div>
+      <p class="phase__lede">El activo clave. Se hace aislado, antes de construir nada alrededor.</p>
+      <ul class="tasks">
+        <li><span>1.1</span><span>Dibujar la <span class="u-hi">isometría de la red contra incendio</span> en SVG: montante, gabinete, hidrante, extintor, detector, bomba, cámara y casco — los 8 ramales colgando de una sola montante</span></li>
+        <li><span>1.2</span><span>Aplicar los tres grosores: <code>0,5 px / ink-300</code> retícula y auxiliares · <code>1 px / ink-600</code> separadores y contornos · <code>2 px / ink-900</code> elemento activo. <span class="u-hi">El grosor es la jerarquía</span></span></li>
+        <li><span>1.3</span><span>El <span class="u-hi">ramal de extintores en <code>fire-600</code></span>, y es un enlace. Único elemento rojo del encuadre</span></li>
+        <li><span>1.4</span><span>El ramal de agua (redes húmedas, hidrantes) en <code>teal-600</code></span></li>
+        <li><span>1.5</span><span><span class="u-hi">Segmentos direccionables individualmente</span> (<code>id</code> por segmento). La Fase 6 interpola el <code>stroke</code> de cada uno; si el SVG es un blob monolítico, la intro se vuelve imposible</span></li>
+        <li><span>1.6</span><span>Los <span class="u-hi">8 símbolos normados</span> como componentes SVG reutilizables, de trazo consistente, derivados de la simbología real de plano</span></li>
+        <li><span>1.7</span><span>Responsive en 360 / 768 / 1024 / 1440: la lámina <span class="u-hi">recorta y reordena</span>, no se escala a la miniatura ilegible</span></li>
+        <li><span>1.8</span><span>Superposición: un elemento al frente <span class="u-hi">interrumpe la línea</span> del que está detrás. Es lo que da profundidad sin una sola sombra</span></li>
+      </ul>
+      <div class="gate gate--risk">
+        <span class="gate__label">Compuerta</span>
+        <p><span class="u-hi">La más importante del proyecto.</span> El dibujo <strong>se lee como un plano técnico creíble, no como decoración</strong>. Prueba concreta: si alguien del oficio lo mira y reconoce la simbología, pasa. Si parece una ilustración de líneas bonitas, no pasa — y hay que rehacerlo <em>acá</em>, con una página de costo, no con once rutas encima.</p>
+        <p><span class="u-hi">Entregable:</span> una sola página que muestre la lámina en los 4 breakpoints más los 8 símbolos en fila. Nada más.</p>
+      </div>
+      <p class="dep"><b>En paralelo →</b> dibujar los 4 fotogramas del storyboard de la intro (0 s / 1 s / 2 s / 3 s) y mandarlos al cliente. Así la aprobación llega mucho antes de que la F6 la necesite.</p>
+    </section>
+
+    <!-- F2 -->
+    <section class="phase">
+      <div class="phase__head">
+        <span class="phase__num mono">02</span>
+        <h2 class="lettering phase__name">Sistema de componentes</h2>
+        <span class="chip chip--ok">sin dependencias externas</span>
+      </div>
+      <p class="phase__lede">Los diez componentes del alcance §6.5, cada uno con todos sus estados.</p>
+      <ul class="tasks">
+        <li><span>2.1</span><span><code>TitleBlock</code> — el cuadro de rótulo. El componente más recurrente del sitio</span></li>
+        <li><span>2.2</span><span><code>Branch</code> — el ramal de servicio. <span class="u-hi">Reemplaza a la tarjeta de servicio</span>: símbolo + número de detalle + título + norma en mono, sin contenedor y sin sombra</span></li>
+        <li><span>2.3</span><span><code>Symbol</code>, <code>Dimension</code> (la cota), <code>RevisionStamp</code>, <code>DetailView</code></span></li>
+        <li><span>2.4</span><span><code>FigureBand</code> — las 4 cifras con filetes de 1 px. <span class="u-hi">Sin tarjeta y sin contador animado</span></span></li>
+        <li><span>2.5</span><span><code>FormCell</code> — campo como celda de cuadro de llenado: filete inferior, etiqueta arriba, foco con anillo cobre de 2 px. <span class="u-hi">Nunca hundido, nunca del color del fondo</span></span></li>
+        <li><span>2.6</span><span><code>NormTimeline</code> (mensual → anual → 5 años) y <code>Breadcrumb</code> (<code>RED GENERAL / DETALLE 03 / EXTINTORES</code>)</span></li>
+        <li><span>2.7</span><span><code>Header</code> (píldora fija que se compacta al scroll), <code>Footer</code>, <code>MobileMenu</code>, <code>WhatsAppButton</code> — el único elemento circular del sitio</span></li>
+        <li><span>2.8</span><span><span class="u-hi">Superficies del navegador</span>, tematizadas desde la paleta: selección de texto, cursor de inserción, barra de desplazamiento, anillo de foco, <code>text-underline-offset</code> y numerales tabulares. Es lo que más se salta y lo que más delata un sitio armado en vez de construido</span></li>
+      </ul>
+      <div class="gate">
+        <span class="gate__label">Compuerta</span>
+        <p>Una página de componentes que muestre <strong>cada componente en cada estado</strong>: reposo, hover, activo, foco, deshabilitado, error, vacío, cargando. Contraste <strong>medido con el inspector, no asumido</strong> — cuerpo y placeholders ≥ 4,5:1, texto grande ≥ 3:1. Navegación completa por teclado con foco siempre visible. Un solo radio de esquina (<code>0</code>) en todo, con la única excepción documentada del botón de WhatsApp.</p>
+      </div>
+    </section>
+
+    <!-- F3 -->
+    <section class="phase">
+      <div class="phase__head">
+        <span class="phase__num mono">03</span>
+        <h2 class="lettering phase__name">Portada</h2>
+      </div>
+      <p class="phase__lede">Las 8 secciones en el orden nuevo: audiencia local primero, minería como prueba.</p>
+      <ul class="tasks">
+        <li><span>3.1</span><span><span class="u-hi">Hero exactamente como lo fija el contrato de dirección:</span> lámina a sangre, H1 a dos líneas alineado a la izquierda, acción principal abajo a la izquierda con el número de WhatsApp visible al costado, cuadro de rótulo abajo a la derecha</span></li>
+        <li><span>3.2</span><span><span class="u-hi">Tres entradas por urgencia</span> — «Recargar extintores» / «Necesito certificado para Defensa Civil o mi seguro» / «Instalación nueva». Filas sobre el dibujo, no tarjetas. Cada una entra al servicio o al formulario con el asunto ya seleccionado</span></li>
+        <li><span>3.3</span><span>Las 8 líneas como ramales de la red · «Por qué un solo proveedor» con la banda de las 4 cifras</span></li>
+        <li><span>3.4</span><span>Respaldo: 12 clientes en <span class="u-hi">lista tipográfica de nombres</span> (nunca logotipos) + 3 proyectos + el aval MINEM y aseguradoras</span></li>
+        <li><span>3.5</span><span>Catálogo destacado (5 clases de extintor normadas) · línea de tiempo normativa · cierre con el rótulo completo, <span class="u-hi">sin banda roja a sangre</span></span></li>
+        <li><span>3.6</span><span>Trazado de la lámina con <code>stroke-dashoffset</code>, <span class="u-hi">una sola vez</span>, de la montante hacia los ramales</span></li>
+      </ul>
+      <div class="gate">
+        <span class="gate__label">Compuerta</span>
+        <p>El hero entra <strong>completo en la primera pantalla</strong>: H1 máximo 2 líneas en escritorio, subtítulo máximo 20 palabras, acción visible sin scroll, padding superior tope <code>pt-24</code>. Contenido real de <code>/content</code>, no <em>lorem</em>. Una sola etiqueta por intención. Cero eyebrows.</p>
+        <p><span class="u-hi">Método:</span> rondas acotadas, no un bucle. Se construye completo, se inspecciona una vez con una ronda por lotes —escritorio y móvil juntos—, se corrige todo en un solo lote, se confirma con <strong>una ronda más como máximo</strong>, y se para.</p>
+      </div>
+    </section>
+
+    <!-- F4 -->
+    <section class="phase">
+      <div class="phase__head">
+        <span class="phase__num mono">04</span>
+        <h2 class="lettering phase__name">Rutas internas</h2>
+      </div>
+      <ul class="tasks">
+        <li><span>4.1</span><span><code>/nosotros</code> — quiénes somos, visión, misión <span class="u-hi">sin la frase de monitoreo 24 h</span> hasta que el cliente la confirme, pilares, valores propuestos</span></li>
+        <li><span>4.2</span><span><code>/servicios</code> y <code>/servicios/[slug]</code> — las 8 páginas con <code>generateStaticParams</code>. Patrón <code>DetailView</code>, y <span class="u-hi">cada una abre con un diagrama, no con un párrafo</span>, con línea de referencia al dato que decide la compra</span></li>
+        <li><span>4.3</span><span><code>/productos</code> y <code>/productos/[categoria]</code> — las 5 clases normadas (PQS, CO₂, agua, espuma, acetato de potasio) + EPP, cada ficha con <code>estado: 'borrador'</code></span></li>
+        <li><span>4.4</span><span><code>/proyectos</code> · <code>/contacto</code> con mapa en iframe sin API key · <code>/cotizar</code> que recibe <code>?servicio=</code> y <code>?producto=</code></span></li>
+        <li><span>4.5</span><span><code>/politica-de-privacidad</code> (Ley N.º 29733) y <code>/404</code></span></li>
+      </ul>
+      <div class="gate">
+        <span class="gate__label">Compuerta</span>
+        <p>Las 11 rutas presentes en <code>/out</code> como <code>ruta/index.html</code>. Cero enlaces muertos. Migas de pan consistentes. Los bloques de datos pendientes <strong>no se renderizan</strong> en lugar de mostrar vacíos: sin horario, sin fila de redes, sin sellos inventados.</p>
+      </div>
+    </section>
+
+    <!-- F5 -->
+    <section class="phase">
+      <div class="phase__head">
+        <span class="phase__num mono">05</span>
+        <h2 class="lettering phase__name">Formularios</h2>
+        <span class="chip chip--ok">funciona sin backend</span>
+      </div>
+      <p class="phase__lede">Completos y demostrables sin servidor, gracias al adaptador de endpoint del alcance §8.7.</p>
+      <ul class="tasks">
+        <li><span>5.1</span><span><code>react-hook-form</code> + <code>zod</code>. <code>ContactForm</code> y <code>QuoteForm</code> con <code>FormCell</code>: etiqueta arriba, ayuda en el markup, error abajo. <span class="u-hi">Nunca placeholder como etiqueta</span></span></li>
+        <li><span>5.2</span><span>Estados animados: enviando, éxito, error — retroalimentación, uno de los pocos efectos que sobrevivió el recorte de movimiento</span></li>
+        <li><span>5.3</span><span>Casilla de consentimiento de datos (Ley N.º 29733), obligatoria</span></li>
+        <li><span>5.4</span><span><code>FORM_ENDPOINT</code> desde <code>NEXT_PUBLIC_FORM_ENDPOINT</code>. Sin definir → valida, muestra estados y escribe el payload en consola</span></li>
+        <li><span>5.5</span><span>Campo honeypot y marca de tiempo firmada ya en el markup, listos para que el PHP los lea en la F9</span></li>
+      </ul>
+      <div class="gate">
+        <span class="gate__label">Compuerta</span>
+        <p>Validación completa y <strong>los tres estados demostrables sin servidor</strong>. Contraste de formulario medido: campos, placeholders, anillos de foco, texto de ayuda y texto de error, todos AA contra el fondo de su sección. Las etiquetas de los botones no se parten en dos líneas en escritorio.</p>
+      </div>
+    </section>
+
+    <!-- F6 -->
+    <section class="phase">
+      <div class="phase__head">
+        <span class="phase__num mono">06</span>
+        <h2 class="lettering phase__name">La intro</h2>
+        <span class="chip chip--wait">requiere storyboard aprobado</span>
+      </div>
+      <p class="phase__lede">Va casi al final a propósito: anima los segmentos de la lámina, así que la lámina tiene que estar congelada. Animar un dibujo que todavía cambia es hacerlo dos veces.</p>
+      <ul class="tasks">
+        <li><span>6.1</span><span><code>IntroOverlay</code> como client component con <code>dynamic import</code> <span class="u-hi">después del primer render</span></span></li>
+        <li><span>6.2</span><span><code>PlanCanvas</code> — el mismo SVG del hero con un <code>heat</code> por segmento: el <code>stroke</code> interpola <code>ink-600 → fire-600 → ink-600</code>. <span class="u-hi">Sin WebGL y sin shader</span></span></li>
+        <li><span>6.3</span><span><code>Extinguisher</code> — SVG propio en hairline del mismo grosor que la lámina, animado con Framer Motion</span></li>
+        <li><span>6.4</span><span><code>SprayCanvas</code> — Canvas 2D, ~300-600 partículas (móvil ~150) · <code>FogMask</code> con máscara radial</span></li>
+        <li><span>6.5</span><span>Coreografía con <code>useAnimate</code>. Al cerrar, el extintor <span class="u-hi">se convierte en el símbolo del ramal rojo</span> del hero</span></li>
+        <li><span>6.6</span><span>Obligatorios: botón «Saltar intro» visible desde el primer instante · salida con clic, Esc o scroll · solo primera visita de sesión · solo en el inicio · <span class="u-hi">no se muestra con <code>prefers-reduced-motion</code></span> · <code>devicePixelRatio</code> tope 1,5 · liberación de recursos al terminar</span></li>
+      </ul>
+      <div class="gate">
+        <span class="gate__label">Compuerta</span>
+        <p><span class="u-hi">Medida, no estimada.</span> JavaScript de la intro <strong>≤ 40 KB gzip verificado con el analizador de bundle</strong>. 60 fps en un celular de gama media real. Lighthouse sigue ≥ 90 en móvil con la intro activa. <strong>Menos de 3 destellos por segundo</strong> (WCAG 2.3.1) — el encendido es un vire de color gradual, no un parpadeo. Y el hero renderizado debajo en el HTML estático desde el inicio: la intro no retrasa el contenido ni el SEO.</p>
+      </div>
+    </section>
+
+    <!-- F7 -->
+    <section class="phase">
+      <div class="phase__head">
+        <span class="phase__num mono">07</span>
+        <h2 class="lettering phase__name">SEO, analítica y legal</h2>
+      </div>
+      <ul class="tasks">
+        <li><span>7.1</span><span>Metadata por página (title, description, canonical), Open Graph y Twitter con imagen de marca · <code>app/sitemap.ts</code> y <code>app/robots.ts</code></span></li>
+        <li><span>7.2</span><span><span class="u-hi">JSON-LD <code>LocalBusiness</code></span> con nombre, RUC, dirección, teléfono y geo — <span class="u-hi">omitiendo <code>openingHours</code> y <code>sameAs</code></span> hasta que existan los datos. Un horario inventado en datos estructurados es peor que ninguno: Google lo publica en el panel de búsqueda</span></li>
+        <li><span>7.3</span><span><code>Service</code> en JSON-LD por cada uno de los 8 servicios</span></li>
+        <li><span>7.4</span><span>Palabras clave objetivo: <em>recarga de extintores Arequipa</em>, <em>sistemas contra incendio minería</em>, <em>supresión de incendios en equipos pesados</em>, <em>redes de agua contra incendio</em>, <em>capacitación de brigadistas</em></span></li>
+        <li><span>7.5</span><span>Pipeline de imágenes: WebP/AVIF en el build, <code>loading="lazy"</code>, ninguna imagen sobre 300 KB</span></li>
+      </ul>
+      <div class="gate">
+        <span class="gate__label">Compuerta</span>
+        <p>JSON-LD válido en el validador de resultados enriquecidos de Google, <strong>sin campos inventados</strong>. Sitemap con las 11 rutas. <em>Matomo se instala en la F10: necesita el cPanel.</em></p>
+      </div>
+    </section>
+
+    <!-- F8 -->
+    <section class="phase phase--must">
+      <div class="phase__head">
+        <span class="phase__num mono">08</span>
+        <h2 class="lettering phase__name">Revisión de cierre</h2>
+        <span class="chip chip--must">obligatoria por contrato</span>
+      </div>
+      <p class="phase__lede">El contrato de dirección cierra con esta línea, literal: «unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance». Una página que parece terminada con esta fase sin descargar no está terminada: está abandonada en la línea de meta.</p>
+      <ul class="tasks">
+        <li><span>8.1</span><span><code>impeccable-finish-reviewer</code> contra el contrato: ¿cumplió el FIRST VIEWPORT? ¿existe el momento autoral prometido? Devuelve una lista ordenada de arreglos materiales</span></li>
+        <li><span>8.2</span><span>Pasada de <code>craft-floor</code> en <span class="u-hi">una ronda por lotes</span>: contraste, profundidad, espaciado, tipografía (medida 65-75ch, tracking piso −0,04em), movimiento, estados, superficies del navegador, textos, cobertura</span></li>
+        <li><span>8.3</span><span><code>/impeccable audit</code> (accesibilidad, rendimiento, responsive) y <code>/impeccable polish</code></span></li>
+        <li><span>8.4</span><span><code>impeccable-documenter</code> escribe <span class="u-hi"><code>DESIGN.md</code> a partir del artefacto construido</span>, no de las intenciones. El orden importa: un reglamento escrito antes del build se defiende contra la realidad en vez de describirla</span></li>
+        <li><span>8.5</span><span>Procedencia de cada raster que se publica</span></li>
+        <li><span>8.6</span><span>Lighthouse ≥ 90 en Performance, Accesibilidad, Best Practices y SEO, <span class="u-hi">en móvil</span>. LCP &lt; 2,5 s, CLS &lt; 0,1</span></li>
+        <li><span>8.7</span><span>Cross-browser: últimas 2 versiones de Chrome, Edge, Firefox y Safari, iOS incluido</span></li>
+      </ul>
+      <div class="gate gate--must">
+        <span class="gate__label">Compuerta</span>
+        <p>Veredicto de la revisión de cierre emitido, <code>DESIGN.md</code> escrito, Lighthouse en verde en los cuatro ejes. <strong>Acá termina el build.</strong></p>
+      </div>
+    </section>
+
+    <!-- F9 -->
+    <section class="phase phase--gate">
+      <div class="phase__head">
+        <span class="phase__num mono">09</span>
+        <h2 class="lettering phase__name">Backend PHP y correo</h2>
+        <span class="chip chip--gate">bloqueada por hosting</span>
+      </div>
+      <p class="phase__lede">Lo único que espera de verdad. Todo lo anterior se puede terminar antes.</p>
+      <ul class="tasks">
+        <li><span>9.1</span><span><code>contact.php</code> con PHPMailer por Composer. Solo <code>POST</code>, solo <code>application/json</code>, <code>Origin</code> verificado contra el dominio, longitud máxima por campo, escapado de todo lo que va al HTML del correo, mensajes de error genéricos sin trazas</span></li>
+        <li><span>9.2</span><span>Credenciales en <code>config.php</code> <span class="u-hi">fuera de <code>public_html</code></span> y <span class="u-hi">nunca en el repositorio</span></span></li>
+        <li><span>9.3</span><span><code>Deny from all</code> en <code>.htaccess</code> para <code>/vendor</code> y para todo <code>/api</code> salvo <code>contact.php</code>. El <code>vendor/</code> de PHPMailer no puede quedar accesible por web</span></li>
+        <li><span>9.4</span><span>Anti-spam: honeypot + trampa de tiempo + <span class="u-hi">Altcha autoalojado</span> + límite de 5 envíos por IP cada 10 minutos. Sin cuentas de terceros y sin banner de cookies</span></li>
+        <li><span>9.5</span><span>SMTP de Zoho: <code>smtp.zoho.com</code> puerto 465 SSL, <span class="u-hi">contraseña de aplicación</span> (obligatoria con 2FA), <code>From</code> igual al buzón autenticado, <code>Reply-To</code> al correo del visitante</span></li>
+        <li><span>9.6</span><span><span class="u-hi">DNS:</span> MX a Zoho · SPF <code>v=spf1 include:zoho.com ~all</code> (uno solo) · DKIM del panel de Zoho · DMARC <code>p=none</code> al inicio</span></li>
+        <li><span>9.7</span><span><span class="u-hi">cPanel › Email Routing → «Remote Mail Exchanger».</span> Sin esto el servidor entrega localmente los correos del propio dominio y <strong>nunca llegan a Zoho</strong>. Es el error más común de esta configuración</span></li>
+        <li><span>9.8</span><span>Verificar con el proveedor que permita SMTP saliente a 465/587 — varios cPanel compartidos lo bloquean. <span class="u-hi">Plan B:</span> ZeptoMail por API HTTP</span></li>
+      </ul>
+      <div class="gate">
+        <span class="gate__label">Compuerta</span>
+        <p>Un envío de prueba desde el formulario publicado <strong>llega a la bandeja de entrada de Zoho y no a spam</strong>, probado contra Gmail y contra Outlook. SPF, DKIM y DMARC pasando en un verificador de cabeceras.</p>
+      </div>
+      <p class="dep"><b>Prerrequisitos del cliente →</b> cPanel contratado · dominio apuntado · buzones Zoho creados · accesos al registrador de DNS y a la consola de Zoho.</p>
+    </section>
+
+    <!-- F10 -->
+    <section class="phase">
+      <div class="phase__head">
+        <span class="phase__num mono">10</span>
+        <h2 class="lettering phase__name">Despliegue</h2>
+      </div>
+      <ul class="tasks">
+        <li><span>10.1</span><span><code>npm run build</code> → subir el contenido de <code>/out</code> a <code>public_html</code>, más <code>/api/contact.php</code> y <code>vendor/</code></span></li>
+        <li><span>10.2</span><span><code>.htaccess</code>: forzar HTTPS y host canónico · <code>ErrorDocument 404 /404.html</code> · caché larga para <code>/_next/static/*</code> · compresión gzip/brotli · cabeceras de seguridad (<code>X-Content-Type-Options</code>, <code>Referrer-Policy</code>, <code>X-Frame-Options</code>, <code>Permissions-Policy</code>)</span></li>
+        <li><span>10.3</span><span>AutoSSL (Let's Encrypt) desde cPanel · PHP 8.1+ en MultiPHP Manager</span></li>
+        <li><span>10.4</span><span>Verificar con DNS y <code>whois</code> si <code>portugalseguridad.com</code> sigue siendo del cliente. Si sí, 301 al dominio nuevo</span></li>
+        <li><span>10.5</span><span><span class="u-hi">Matomo</span> autoalojado por Softaculous, modo sin cookies, sin banner de consentimiento</span></li>
+        <li><span>10.6</span><span>Alta en Google Search Console y en Google Business Profile con la dirección de Cerro Colorado</span></li>
+        <li><span>10.7</span><span><em>Opcional:</em> GitHub Actions con despliegue FTP/SFTP al hacer push a <code>main</code></span></li>
+      </ul>
+      <div class="gate">
+        <span class="gate__label">Compuerta</span>
+        <p>Sitio en vivo por HTTPS, 404 funcionando, cabeceras presentes, Lighthouse ≥ 90 <strong>medido en producción</strong>, no en local.</p>
+      </div>
+    </section>
+
+    <!-- F11 -->
+    <section class="phase">
+      <div class="phase__head">
+        <span class="phase__num mono">11</span>
+        <h2 class="lettering phase__name">Entrega</h2>
+      </div>
+      <ul class="tasks">
+        <li><span>11.1</span><span>Manual breve: cómo editar <code>/content</code> y cómo desplegar</span></li>
+        <li><span>11.2</span><span>Acceso al repositorio</span></li>
+        <li><span>11.3</span><span>Lista de lo que sigue pendiente del cliente y qué desbloquea cada cosa</span></li>
+      </ul>
+    </section>
+
+  </div>
+
+  <!-- ══════════════════ DEPENDENCIAS DEL CLIENTE ══════════════════ -->
+  <section class="block">
+    <h2 class="lettering">Qué necesita el cliente</h2>
+    <p class="block__note">Ninguno de estos frena las fases 0 a 8.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Pendiente</th><th>Desbloquea</th><th>Urgencia</th><th>Nota</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="u-hi">cPanel contratado, dominio apuntado</td><td class="u-mono">F9 · F10</td><td class="pri pri--hi">Alta</td><td>El único bloqueo real del proyecto</td></tr>
+          <tr><td class="u-hi">Buzones Zoho + accesos a DNS y a la consola de Zoho</td><td class="u-mono">F9</td><td class="pri pri--hi">Alta</td><td>Los crea el cliente; acá solo se integra y se configura DNS</td></tr>
+          <tr><td>Aprobar los 4 fotogramas del storyboard</td><td class="u-mono">F6</td><td class="pri pri--mid">Media</td><td>Se le manda en la F1, así hay tiempo de sobra</td></tr>
+          <tr><td>Logo editable + autorización para vectorizar</td><td class="u-mono">mejora F2</td><td class="pri pri--mid">Media</td><td>Mientras tanto el header usa el wordmark tipográfico, que se ve intencional y no provisional</td></tr>
+          <tr><td>Fotos en alta resolución — lista de 12 tomas</td><td class="u-mono">mejora F3 · F4</td><td class="pri pri--mid">Media</td><td><span class="u-hi">El diseño no depende de ellas.</span> Cuando lleguen, entran como detalle recortado dentro de la lámina, nunca como fondo de hero</td></tr>
+          <tr><td>Lista real de productos</td><td class="u-mono">F4</td><td class="pri pri--mid">Media</td><td>Reemplaza las 5 clases normadas sembradas al inicio</td></tr>
+          <tr><td>Grafía oficial de la razón social</td><td class="u-mono">F4</td><td class="pri pri--lo">Baja</td><td>Se consulta gratis y sin login por el RUC 20600361172</td></tr>
+          <tr><td>¿Se ofrece monitoreo 24 h?</td><td class="u-mono">F4</td><td class="pri pri--lo">Baja</td><td>Hasta confirmarlo la frase no se publica: sin el servicio es publicidad engañosa</td></tr>
+          <tr><td>Horario de atención</td><td class="u-mono">F7</td><td class="pri pri--lo">Baja</td><td>Sin el dato se omite el bloque y <code>openingHours</code></td></tr>
+          <tr><td>Redes sociales</td><td class="u-mono">F7</td><td class="pri pri--lo">Baja</td><td>Sin el dato no se dibuja la fila ni <code>sameAs</code></td></tr>
+          <tr><td>Certificaciones vigentes</td><td class="u-mono">F4</td><td class="pri pri--lo">Baja</td><td>Sección condicional. No se dibujan sellos inventados</td></tr>
+          <tr><td>¿<code>portugalseguridad.com</code> sigue activo?</td><td class="u-mono">F10</td><td class="pri pri--lo">Baja</td><td>Se verifica el día del despliegue</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════ FUERA DE ALCANCE ══════════════════ -->
+  <section class="block">
+    <h2 class="lettering">Fuera de alcance</h2>
+    <p class="block__note">Salvo acuerdo adicional.</p>
+    <div class="out">
+      <span>Tienda en línea o pasarela de pagos</span>
+      <span>Precios públicos</span>
+      <span>CMS o panel administrativo</span>
+      <span>Versión en inglés</span>
+      <span>Blog o noticias</span>
+      <span>Portal de clientes</span>
+      <span>Producción fotográfica o de video</span>
+      <span>Google Ads o Meta Ads</span>
+      <span>Creación de los buzones en Zoho</span>
+      <span>Modo oscuro</span>
+    </div>
+    <p class="block__note" style="margin-top:22px">Dos con salida prevista: el <span class="u-hi">CMS</span> como fase 2 con Decap, Sanity o TinaCMS; y el <span class="u-hi">modo oscuro</span>, que el sistema de lámina técnica deja barato — es invertir un juego de tokens, porque no hay sistema de sombras que rehacer. Con el neumorfismo de la versión anterior del alcance habría sido un segundo sistema completo.</p>
+  </section>
+
+  <footer class="foot">
+    <span>Portugal Seguridad · Plan de obra · Rev. 1</span>
+    <span>12 fases · 8 sin dependencias</span>
+    <span>26.09.2026</span>
+  </footer>
+
+</main>

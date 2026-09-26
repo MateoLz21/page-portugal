@@ -1,0 +1,14 @@
+# Normaliza finales de línea: LF en el repositorio, sea quien sea que clone.
+# Sin esto, Windows convierte a CRLF y cada commit ensucia el diff.
+* text=auto eol=lf
+
+# Binarios: nunca tocar
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.woff binary
+*.woff2 binary
+*.ico binary
+*.pdf binary
