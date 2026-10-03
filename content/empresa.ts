@@ -41,6 +41,11 @@ export const empresa = {
   aniosExperiencia: 20,
   normativa: ['NFPA', 'Normas Técnicas Peruanas (NTP)'],
 
+  /** Resumen del pie. Es el subtítulo del hero de §4.1, sin agregar nada. */
+  resumen:
+    'Recarga de extintores, redes de agua, detección y capacitación. ' +
+    'Normas NFPA y NTP. Más de 20 años en Arequipa.',
+
   /* ── Pendiente del cliente: null / [] = el bloque no se dibuja ── */
 
   /** §13.1 punto 2. Sin este dato se omite el bloque de horario Y

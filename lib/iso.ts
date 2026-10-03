@@ -71,6 +71,49 @@ export function trazo(puntos: readonly Punto3D[], unidad: number): string | null
 }
 
 /**
+ * Igual que `trazo`, pero con los dos extremos acortados `recorte` unidades de
+ * usuario, medidas ya en pantalla.
+ *
+ * Es el trazo del **halo** de un tubo. El halo existe para interrumpir lo que
+ * el tubo cruza por delante, pero en sus extremos el tubo no cruza nada: se
+ * une a otro. Con el halo completo, cada unión mordía la línea a la que
+ * llegaba —el ramal le sacaba un bocado al colector, el anillo al montante— y
+ * las aristas no coincidían con sus vértices. Acortado, el halo ocluye a lo
+ * largo del tubo y deja las uniones intactas.
+ *
+ * Un tramo más corto que el recorte cede a lo sumo la mitad de su largo.
+ */
+export function trazoRecortado(
+  puntos: readonly Punto3D[],
+  unidad: number,
+  recorte: number,
+): string | null {
+  if (puntos.length < 2) return null
+
+  const p = puntos.map((punto) => proyectar(punto, unidad))
+
+  const acercar = (desde: Punto2D, hacia: Punto2D): Punto2D => {
+    const dx = hacia[0] - desde[0]
+    const dy = hacia[1] - desde[1]
+    const largo = Math.hypot(dx, dy)
+    if (largo === 0) return desde
+    const t = Math.min(recorte, largo / 2) / largo
+    return [desde[0] + dx * t, desde[1] + dy * t]
+  }
+
+  const ultimo = p.length - 1
+  const recortados = p.map((punto, i) => {
+    if (i === 0) return acercar(punto, p[1] ?? punto)
+    if (i === ultimo) return acercar(punto, p[ultimo - 1] ?? punto)
+    return punto
+  })
+
+  return recortados
+    .map(([px, py], i) => `${i === 0 ? 'M' : 'L'}${redondear(px)} ${redondear(py)}`)
+    .join(' ')
+}
+
+/**
  * Caja que contiene una lista de puntos ya proyectados, con margen.
  * Sirve para calcular el `viewBox` a partir de la geometría real, en vez de
  * ajustarlo a ojo cada vez que se mueve un ramal.

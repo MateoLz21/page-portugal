@@ -168,10 +168,22 @@ type SimboloProps = {
    * oculta de la accesibilidad. Cuando va solo, necesita su nombre.
    */
   decorativo?: boolean
+  /**
+   * Grosor del trazo en píxeles de pantalla, fijo aunque el símbolo se amplíe.
+   * Para los detalles a mayor escala: sin esto el trazo crece con el dibujo y
+   * a 130 px mide 8, fuera de los tres grosores del sistema (§6.6).
+   */
+  grosor?: number
 }
 
 /** Un símbolo suelto, en su propio `<svg>`. */
-export function Simbolo({ id, tamano = 40, className, decorativo = false }: SimboloProps) {
+export function Simbolo({
+  id,
+  tamano = 40,
+  className = '',
+  decorativo = false,
+  grosor,
+}: SimboloProps) {
   const nombre = nombresSimbolos[id]
 
   return (
@@ -179,8 +191,10 @@ export function Simbolo({ id, tamano = 40, className, decorativo = false }: Simb
       width={tamano}
       height={tamano}
       viewBox={`0 0 ${CAJA_SIMBOLO} ${CAJA_SIMBOLO}`}
-      className={className}
+      // `vector-effect` no se hereda: hay que ponerlo en cada figura.
+      className={grosor ? `[&_*]:[vector-effect:non-scaling-stroke] ${className}` : className}
       {...trazoSimbolo}
+      strokeWidth={grosor ?? trazoSimbolo.strokeWidth}
       {...(decorativo ? { 'aria-hidden': true } : { role: 'img', 'aria-label': nombre })}
     >
       {geometriaSimbolos[id]}

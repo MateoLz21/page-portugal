@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Archivo, JetBrains_Mono } from 'next/font/google'
+import { Movimiento } from '@/components/motion/Movimiento'
 import { empresa } from '@/content/empresa'
 import './globals.css'
 
@@ -42,7 +43,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-PE" className={`${archivo.variable} ${jetbrains.variable}`}>
-      <body>{children}</body>
+      <body>
+        <Movimiento>{children}</Movimiento>
+      </body>
     </html>
   )
 }

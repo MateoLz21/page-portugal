@@ -6,15 +6,18 @@
 
 ---
 
----
+## Estado de las fases
 
-## Bitácora
+> El **log de sesiones, los pendientes y las trampas conocidas** viven en
+> [`BITACORA.md`](../BITACORA.md), en la raíz del proyecto. Acá queda solo el
+> avance de las fases, que es lo que le pertenece a este documento. Dos bitácoras
+> se desincronizan.
 
 | Fase | Estado | Cierre |
 |---|---|---|
 | **0 · Andamiaje y tokens** | ✅ **Cerrada** | 26/09/2026. Build genera `/out`; fuentes autoalojadas verificadas (cero llamadas a Google en runtime); tokens de §6.2 resuelven; lint, typecheck y format en cero. Cuatro versiones fijadas por incompatibilidad de upstream: `eslint` fuera de `next.config.ts` (Next 16 ya no lo acepta), eslint en 9 (los plugins de `eslint-config-next` no soportan 10), TypeScript en 6.0.3 (`typescript-eslint@8` acepta `<6.1.0`; con TS 7 el build funciona pero el lint no arranca), y `eslint-config-next` importado como flat config nativo, sin `FlatCompat`. |
 | **1 · La lámina** | ✅ **Cerrada** | 26/09/2026. **Compuerta aprobada por el cliente: «sí se lee como un plano».** Isometría de red en escritorio, diagrama de montante en móvil, 10 símbolos normados, rótulos con colocación automática sin encimarse, 3 cruces de anillo con oclusión, ids de segmento únicos para la Fase 6. Detector en cero contra el código y contra la página renderizada. **Storyboard de la intro entregado** (`docs/storyboard-intro.html`): 4 fotogramas renderizados desde la geometría real, que además prueban el modelo de calor de la Fase 6. |
-| 2 · Sistema de componentes | ⏳ Siguiente | |
+| 2 · Sistema de componentes | 🔧 Construida, compuerta abierta | 30/09/2026. Componentes y hoja `/componentes/` listos; comandos y detector en cero; contraste calculado para 16 pares. **Falta** la pasada de teclado y la aprobación visual. |
 | 3 · Portada | ⏳ | |
 | 4 · Rutas internas | ⏳ | |
 | 5 · Formularios | ⏳ | |
@@ -24,11 +27,6 @@
 | 9 · Backend PHP y correo | ⛔ Bloqueada | Espera cPanel contratado y buzones Zoho |
 | 10 · Despliegue | ⏳ | |
 | 11 · Entrega | ⏳ | |
-
-### Correcciones que la Fase 1 dejó en el alcance
-
-- **§6.3, medida de lectura.** El valor era `68ch`; medido en el navegador, `66ch` rendía **89 caracteres** por línea. En Archivo el glifo `0` —que es lo que mide la unidad `ch`— es más ancho que el promedio de una minúscula en español, así que `1ch` ≈ 1,35 caracteres. Corregido a la utilidad `medida` con `56ch`.
-- **Retícula de plano.** La primera versión usaba la palabra clave `transparent` en el degradado, que es `rgba(0,0,0,0)` —negro con alfa cero—. Además de arruinar la medición de contraste, interpolar hacia ella deja franja gris en varios motores. Ahora el hueco es papel con alfa cero, nombrado en un token, y la superficie pinta su propio fondo.
 
 ---
 

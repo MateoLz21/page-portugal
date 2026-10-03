@@ -21,6 +21,7 @@ import {
   colocarAlCostado,
   colocarDebajo,
   type EntradaRotulo,
+  type Obstaculo,
   type RotuloColocado,
 } from '@/lib/rotulos'
 
@@ -235,24 +236,38 @@ export const LADO_TERMINAL = { normal: 32, destacado: 40 } as const
  *
  * Ahora se elige `u = x - y`, que **es** la posición en pantalla, y se deriva
  * `x = u + y`. Con `u` en paso constante la separación horizontal queda
- * garantizada por construcción: 2,65 unidades de grilla = 78 px, holgura de
- * 36 px o más entre símbolos. `y` sigue variando libremente para el ritmo de
- * profundidad, porque ya no afecta la separación.
+ * garantizada por construcción: 3 unidades de grilla = 88 px entre centros,
+ * 56 px libres entre símbolos. El paso también fija el escalón vertical entre
+ * terminales vecinos (51 px), que es lo que deja lugar al rótulo de cada uno.
  */
-const U_PRIMER_RAMAL = 2.0
-const U_PASO = 2.65
+const U_PRIMER_RAMAL = 2.4
+const U_PASO = 3.0
 
-/** Profundidad de cada ramal. Varía para que la red no se lea como un peine. */
-const Y_RAMAL: readonly number[] = [1.4, 2.4, 1.0, 2.8, 1.6, 2.6, 1.2, 2.2]
+/**
+ * Profundidad y cota del terminal, **iguales para los ocho ramales**.
+ *
+ * La primera versión variaba las dos por ramal para dar ritmo, y el resultado
+ * se leía desordenado: bajadas de largo distinto, símbolos a alturas sin
+ * relación entre sí y rótulos que caían encima del símbolo vecino. En un
+ * isométrico de tubería real los ramales de un mismo colector son paralelos y
+ * las bajadas iguales; la regularidad es lo que hace legible el dibujo.
+ *
+ * Iguales, los ocho terminales quedan sobre una recta paralela al colector, y
+ * debajo de cada uno hay una franja libre donde entra su rótulo.
+ *
+ * Los dos valores están atados al anillo (ver `Y_ANILLO`): la bajada tiene que
+ * cruzarlo y seguir lo suficiente para que el símbolo y su rótulo queden
+ * despejados por debajo. Con estos números el anillo pasa 34 px por encima del
+ * borde del símbolo.
+ */
+const Y_RAMAL = 2.2
+const Z_RAMAL = 0.4
 
-/** Cota del terminal sobre el piso. */
-const Z_RAMAL: readonly number[] = [1.9, 1.1, 2.3, 0.8, 1.7, 1.0, 2.1, 1.3]
-
-/** Geometría derivada de los tres parámetros de arriba. */
-const RAMALES_ANCHA: readonly { u: number; x: number; y: number; z: number }[] = Y_RAMAL.map(
-  (y, i) => {
+/** Geometría derivada de los parámetros de arriba. */
+const RAMALES_ANCHA: readonly { u: number; x: number; y: number; z: number }[] = servicios.map(
+  (_, i) => {
     const u = U_PRIMER_RAMAL + i * U_PASO
-    return { u, x: u + y, y, z: Z_RAMAL[i] ?? 1.5 }
+    return { u, x: u + Y_RAMAL, y: Y_RAMAL, z: Z_RAMAL }
   },
 )
 
@@ -283,13 +298,12 @@ const Z_VALVULA_ALTA = 1.1
 const Z_COLECTOR = 3.4
 
 /**
- * Profundidad del anillo de retorno.
+ * Profundidad del anillo de retorno. Tiene que ser mayor que `Y_RAMAL`: el
+ * anillo corre por delante de las bajadas y las cruza a las ocho.
  *
- * NO subir este valor buscando más cruces: hace lo contrario. Medido sobre la
- * geometría real, el anillo cruza la bajada de 3 ramales entre y=3.4 e y=4.6;
- * a partir de 5.2 pasa por debajo de todas y queda 1. El
- * dibujo tampoco cambia de alto, porque la extensión vertical la fijan los
- * terminales, no el anillo. 3.7 ya está en la banda buena.
+ * El colector se prolonga más allá del último ramal lo justo para que ese cruce
+ * también exista (ver `xFinal`). Si se acerca el anillo a `Y_RAMAL`, el cruce
+ * sube hacia el codo del ramal; si se aleja, baja hacia el símbolo.
  */
 const Y_ANILLO = 4.0
 
@@ -319,6 +333,19 @@ function entradasRotulo(terminales: readonly Terminal[], unidad: number): Entrad
   })
 }
 
+/** La caja que ocupa cada símbolo: lo que un rótulo ajeno no puede pisar. */
+function cajasSimbolo(entradas: readonly EntradaRotulo[]): Obstaculo[] {
+  return entradas.map((e) => ({
+    clave: e.clave,
+    caja: {
+      izquierda: e.x - e.lado / 2,
+      arriba: e.y - e.lado / 2,
+      derecha: e.x + e.lado / 2,
+      abajo: e.y + e.lado / 2,
+    },
+  }))
+}
+
 /** Esquinas de las cajas de rótulo, para que el `viewBox` las contenga. */
 function esquinasRotulos(rotulos: readonly RotuloColocado[]): Punto2D[] {
   return rotulos.flatMap((r) => [
@@ -346,8 +373,9 @@ export function construirRed(layout: Layout, instancia = 'red'): Red {
   const terminales: Terminal[] = []
 
   if (layout === 'ancha') {
-    // Derivado: el colector tiene que llegar más allá del ramal más alejado.
-    const xFinal = Math.max(...RAMALES_ANCHA.map((g) => g.x)) + 0.9
+    // Derivado: el colector llega más allá del último ramal lo suficiente para
+    // que el anillo, al volver, cruce también esa bajada.
+    const xFinal = Math.max(...RAMALES_ANCHA.map((g) => g.x)) + (Y_ANILLO - Y_RAMAL) + 0.6
 
     // Montante: sube desde la sala de bombas hasta el colector.
     tubos.push({
@@ -391,8 +419,8 @@ export function construirRed(layout: Layout, instancia = 'red'): Red {
       puntos: [
         [xFinal, 0, Z_COLECTOR],
         [xFinal, Y_ANILLO, Z_COLECTOR],
-        [0.4, Y_ANILLO, Z_COLECTOR],
-        [0.4, 0.3, Z_COLECTOR],
+        [0, Y_ANILLO, Z_COLECTOR],
+        [0, 0, Z_COLECTOR],
       ],
       peso: 'line',
       tinta: 'ink-900',
@@ -423,7 +451,8 @@ export function construirRed(layout: Layout, instancia = 'red'): Red {
       terminales.push({ servicio, punto: [g.x, g.y, g.z] })
     })
 
-    const rotulos = colocarDebajo(entradasRotulo(terminales, unidad))
+    const entradas = entradasRotulo(terminales, unidad)
+    const rotulos = colocarDebajo(entradas, cajasSimbolo(entradas))
     const puntos2D: Punto2D[] = [
       ...tubos.flatMap((t) => t.puntos.map((p) => proyectar(p, unidad))),
       ...esquinasRotulos(rotulos),
@@ -501,6 +530,11 @@ export function construirRed(layout: Layout, instancia = 'red'): Red {
  * Es lo que permite la oclusión de la tarea 1.8: dibujados en este orden, cada
  * tubo tapa con su halo de color papel a los que quedaron detrás, así que el
  * elemento del frente interrumpe la línea del de atrás — como en un plano real.
+ *
+ * El criterio es la profundidad `y`, no `x + y`. En pantalla dos tubos se cruzan
+ * donde coincide su `x − y`, y ahí el de mayor `y` es siempre el más cercano al
+ * observador. Con `x + y` promedio los últimos ramales —de `x` grande— quedaban
+ * por delante del anillo y lo interrumpían, al revés que los primeros.
  */
 function ordenarPorProfundidad(tubos: readonly Tubo[]): readonly Tubo[] {
   return [...tubos].sort((a, b) => profundidadMedia(a) - profundidadMedia(b))
@@ -508,6 +542,6 @@ function ordenarPorProfundidad(tubos: readonly Tubo[]): readonly Tubo[] {
 
 function profundidadMedia(tubo: Tubo): number {
   if (tubo.puntos.length === 0) return 0
-  const suma = tubo.puntos.reduce((acc, [x, y]) => acc + x + y, 0)
+  const suma = tubo.puntos.reduce((acc, [, y]) => acc + y, 0)
   return suma / tubo.puntos.length
 }

@@ -74,7 +74,48 @@
      es un objeto ajeno a la lámina.                             */
   --radius-none: 0;
   --radius-whatsapp: 9999px;
+
+  /* ── WhatsApp: objeto ajeno a la lámina ────────────────────────
+     Mismo criterio que su radio: no es tinta del plano y tiene que
+     leerse como tal. Es el verde oscuro de la marca, no el claro:
+     el glifo en papel da 3,8:1 sobre este y 1,9:1 sobre el claro. */
+  --color-whatsapp: #128c7e;
+
+  /* ── La única sombra del sitio (§6.2) ──────────────────────────
+     Funcional, tintada con ink-900, con desplazamiento y difuminado.
+     Dos usos y nada más: el header cuando se despega del tope y el
+     panel del menú móvil. La profundidad sigue siendo el grosor.  */
+  --shadow-despegue: 0 12px 24px -16px rgb(22 33 43 / 0.5);
+
+  /* Barrido del botón mientras envía. Solo `transform` y `opacity`, y crece
+     por escala desde el borde: nunca sale de la caja del botón. */
+  --animate-barrido: barrido 1.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+
+  @keyframes barrido {
+    0% {
+      transform: scaleX(0);
+      opacity: 1;
+    }
+    70% {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scaleX(1);
+      opacity: 0;
+    }
+  }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   VARIANTES DE ESTADO (§6.6)
+   Cada una acepta su pseudo-clase o un `data-estado` que la fuerza.
+   El atributo existe para la hoja de verificación de la Fase 2, que
+   tiene que mostrar cada estado quieto, uno al lado del otro; el
+   sitio real nunca lo escribe.
+   ════════════════════════════════════════════════════════════════ */
+@custom-variant sobre (&:is(:hover, [data-estado='hover']));
+@custom-variant pulsado (&:is(:active, [data-estado='activo']));
 
 /* ════════════════════════════════════════════════════════════════
    GROSORES DE LÍNEA — el sistema de profundidad completo
@@ -221,20 +262,57 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Superficies del navegador: se tematizan desde la paleta en la
-     Fase 2. Acá va solo lo que no puede esperar. */
+  /* ── Superficies del navegador (§6.5) ────────────────────────
+     Lo que no se dibuja también carga el diseño. Todo sale de la
+     paleta; nada queda en el valor por omisión del navegador.     */
+
+  :root {
+    /* Casillas, radios y barras de progreso nativas. */
+    accent-color: var(--color-ink-900);
+    /* Barra de desplazamiento: pulgar en tinta, canal en papel. */
+    scrollbar-color: var(--color-ink-600) var(--color-paper-alt);
+    /* El header es fijo: un ancla no puede quedar debajo de él. */
+    scroll-padding-top: 6rem;
+    -webkit-tap-highlight-color: rgb(22 33 43 / 0.12);
+  }
+
+  /* Selección: tinta sobre papel invertidos, 13:1. La versión de la
+     Fase 0 usaba cobre con texto papel y medía 3,5:1 — no pasa AA. */
   ::selection {
-    background-color: var(--color-copper-500);
+    background-color: var(--color-ink-900);
     color: var(--color-paper);
   }
 
-  :focus-visible {
+  /* Cursor de inserción en cobre: es la pluma que anota la lámina. */
+  input,
+  textarea,
+  select,
+  [contenteditable] {
+    caret-color: var(--color-copper-500);
+  }
+
+  /* Anillo de foco: cobre de 2px, siempre visible (§6.6). */
+  :focus-visible,
+  [data-estado='foco'] {
     outline: var(--w-bold) solid var(--color-copper-500);
     outline-offset: 2px;
   }
 
+  /* Subrayado: fino y despegado de la línea base. */
+  a {
+    text-decoration-thickness: var(--w-line);
+    text-underline-offset: 0.22em;
+  }
+
+  /* Placeholder: nunca más claro que el texto secundario. */
+  ::placeholder {
+    color: var(--color-ink-600);
+    opacity: 1;
+  }
+
   /* Tablas técnicas y cualquier columna de dígitos */
-  table {
+  table,
+  time {
     font-variant-numeric: tabular-nums;
   }
 

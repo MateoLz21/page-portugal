@@ -7,9 +7,13 @@
  * funciona hasta la primera vez que alguien edita `red.ts`.
  *
  * La estrategia es la de una llamada de plano real: el rótulo va debajo (o al
- * costado) del símbolo, y cuando no cabe **baja un nivel** y se conecta con una
- * línea de referencia. Se recorre de izquierda a derecha y cada rótulo ocupa el
- * primer nivel libre.
+ * costado) del símbolo. Cuando centrado no cabe, primero **se corre de costado**
+ * y, si tampoco, **baja un nivel** y se conecta con una línea de referencia. Se
+ * recorre de izquierda a derecha y cada rótulo ocupa el primer lugar libre.
+ *
+ * Un lugar está libre cuando no pisa ni otro rótulo ni **el símbolo de otro
+ * terminal**. Lo segundo faltaba en la primera versión, que solo comparaba
+ * rótulos entre sí: el rótulo largo del ramal 03 caía sobre el hidrante.
  *
  * Los rótulos van dentro del SVG a propósito. En HTML con tamaño fijo en px la
  * colisión dependería del ancho del viewport —a 768 px los terminales quedan a
@@ -39,8 +43,18 @@ export const PASO_NIVEL = 34
 export const NIVELES = 3
 
 /**
- * Ancho medio de carácter en Archivo expandido y mayúsculas, como fracción del
- * tamaño de fuente.
+ * Corrimientos laterales que se prueban en cada nivel, en orden. Primero
+ * centrado; después hacia la izquierda, que en la isometría es el lado libre
+ * —el terminal siguiente queda abajo a la derecha—, y por último a la derecha.
+ */
+export const CORRIMIENTOS: readonly number[] = [0, -8, -16, -24, -32, -40, 8, 16, 24]
+
+/** Aire mínimo entre un rótulo y el símbolo de otro terminal. */
+export const AIRE_SIMBOLO = 4
+
+/**
+ * Ancho medio de carácter de la línea del número y la norma, que va en mono,
+ * como fracción del tamaño de fuente.
  *
  * Es una estimación, no una medición del navegador: el cálculo corre en el
  * servidor, donde no hay métricas de fuente. Está puesta por lo alto a
@@ -48,6 +62,16 @@ export const NIVELES = 3
  * rótulo se encima, este número es el primero que hay que subir.
  */
 export const ANCHO_CARACTER = 0.64
+
+/**
+ * Lo mismo para el nombre, que va en Archivo expandido, negrita y mayúsculas.
+ *
+ * Es bastante más ancho que la mono y tiene su propio número por eso. La
+ * primera versión usaba 0,64 para las dos líneas; medido sobre el render,
+ * «REDES DE AGUA» ocupa 0,82 por carácter, así que los nombres largos pisaban
+ * el símbolo vecino sin que el cálculo se enterara.
+ */
+export const ANCHO_NOMBRE = 0.86
 
 export type CajaRotulo = {
   readonly izquierda: number
@@ -78,14 +102,33 @@ export type RotuloColocado = {
   /** Línea base de la primera línea de texto. */
   readonly y: number
   readonly nivel: number
-  /** Extremo de la línea de referencia, cuando el rótulo bajó de nivel. */
-  readonly referencia: { readonly desdeY: number; readonly hastaY: number } | null
+  /**
+   * Línea de referencia, cuando el rótulo bajó de nivel. Lleva su propio `x`
+   * —el del símbolo— porque el rótulo puede haberse corrido de costado.
+   */
+  readonly referencia: {
+    readonly x: number
+    readonly desdeY: number
+    readonly hastaY: number
+  } | null
+  readonly caja: CajaRotulo
+}
+
+/** Algo que un rótulo no puede pisar, salvo que sea el suyo. */
+export type Obstaculo = {
+  /** Clave del terminal dueño: su propio rótulo sí puede arrimársele. */
+  readonly clave: string
   readonly caja: CajaRotulo
 }
 
 /** Ancho estimado de un texto, en unidades del dibujo. */
-export function anchoTexto(texto: string, tamano: number): number {
-  return texto.length * ANCHO_CARACTER * tamano
+export function anchoTexto(texto: string, tamano: number, porCaracter = ANCHO_CARACTER): number {
+  return texto.length * porCaracter * tamano
+}
+
+/** Ancho del bloque de rótulo: la más larga de sus dos líneas. */
+function anchoRotulo(e: EntradaRotulo): number {
+  return Math.max(anchoTexto(e.texto, F_NOMBRE, ANCHO_NOMBRE), anchoTexto(e.detalle, F_NUMERO))
 }
 
 function seSolapan(a: CajaRotulo, b: CajaRotulo): boolean {
@@ -94,61 +137,75 @@ function seSolapan(a: CajaRotulo, b: CajaRotulo): boolean {
   )
 }
 
+/** La caja crecida `aire` hacia los cuatro lados. */
+function conAire(caja: CajaRotulo, aire: number): CajaRotulo {
+  return {
+    izquierda: caja.izquierda - aire,
+    arriba: caja.arriba - aire,
+    derecha: caja.derecha + aire,
+    abajo: caja.abajo + aire,
+  }
+}
+
 /**
- * Coloca los rótulos debajo de cada símbolo, bajando de nivel cuando no caben.
+ * Coloca los rótulos debajo de cada símbolo, corriéndolos de costado o bajando
+ * de nivel cuando no caben.
  *
  * Determinista: se ordena por posición horizontal, así que el resultado no
  * depende del orden en que lleguen los terminales.
+ *
+ * @param obstaculos cajas que ningún rótulo ajeno puede pisar; típicamente, los
+ *   símbolos de los terminales
  */
-export function colocarDebajo(entradas: readonly EntradaRotulo[]): readonly RotuloColocado[] {
+export function colocarDebajo(
+  entradas: readonly EntradaRotulo[],
+  obstaculos: readonly Obstaculo[] = [],
+): readonly RotuloColocado[] {
   const puestos: RotuloColocado[] = []
 
   for (const e of [...entradas].sort((a, b) => a.x - b.x)) {
-    const ancho = Math.max(anchoTexto(e.texto, F_NOMBRE), anchoTexto(e.detalle, F_NUMERO))
+    const ancho = anchoRotulo(e)
     const base = e.y + e.lado / 2 + AIRE_ROTULO
+    const ajenos = obstaculos.filter((o) => o.clave !== e.clave)
 
-    let elegido: RotuloColocado | null = null
-
-    for (let nivel = 0; nivel < NIVELES; nivel += 1) {
+    const armar = (nivel: number, corrimiento: number): RotuloColocado => {
       const arriba = base + nivel * PASO_NIVEL
-      const caja: CajaRotulo = {
-        izquierda: e.x - ancho / 2,
-        arriba,
-        derecha: e.x + ancho / 2,
-        abajo: arriba + ALTO_ROTULO,
-      }
-
-      if (puestos.every((p) => !seSolapan(caja, p.caja))) {
-        elegido = {
-          clave: e.clave,
-          x: e.x,
-          y: arriba + F_NUMERO,
-          nivel,
-          referencia: nivel > 0 ? { desdeY: base, hastaY: arriba } : null,
-          caja,
-        }
-        break
+      const x = e.x + corrimiento
+      return {
+        clave: e.clave,
+        x,
+        y: arriba + F_NUMERO,
+        nivel,
+        referencia: nivel > 0 ? { x: e.x, desdeY: base, hastaY: arriba } : null,
+        caja: {
+          izquierda: x - ancho / 2,
+          arriba,
+          derecha: x + ancho / 2,
+          abajo: arriba + ALTO_ROTULO,
+        },
       }
     }
 
-    // Sin nivel libre se coloca en el primero y se acepta el encimado, que es
-    // preferible a no dibujar el rótulo. El detector y la revisión de cierre lo
-    // van a ver; un rótulo ausente pasa desapercibido.
-    puestos.push(
-      elegido ?? {
-        clave: e.clave,
-        x: e.x,
-        y: base + F_NUMERO,
-        nivel: 0,
-        referencia: null,
-        caja: {
-          izquierda: e.x - ancho / 2,
-          arriba: base,
-          derecha: e.x + ancho / 2,
-          abajo: base + ALTO_ROTULO,
-        },
-      },
-    )
+    const libre = (candidato: RotuloColocado) =>
+      puestos.every((p) => !seSolapan(candidato.caja, p.caja)) &&
+      ajenos.every((o) => !seSolapan(candidato.caja, conAire(o.caja, AIRE_SIMBOLO)))
+
+    let elegido: RotuloColocado | null = null
+
+    buscar: for (let nivel = 0; nivel < NIVELES; nivel += 1) {
+      for (const corrimiento of CORRIMIENTOS) {
+        const candidato = armar(nivel, corrimiento)
+        if (libre(candidato)) {
+          elegido = candidato
+          break buscar
+        }
+      }
+    }
+
+    // Sin lugar libre se coloca centrado en el primer nivel y se acepta el
+    // encimado, que es preferible a no dibujar el rótulo. El detector y la
+    // revisión de cierre lo van a ver; un rótulo ausente pasa desapercibido.
+    puestos.push(elegido ?? armar(0, 0))
   }
 
   return puestos
@@ -164,7 +221,7 @@ export function colocarAlCostado(entradas: readonly EntradaRotulo[]): readonly R
   return [...entradas]
     .sort((a, b) => a.y - b.y)
     .map((e) => {
-      const ancho = Math.max(anchoTexto(e.texto, F_NOMBRE), anchoTexto(e.detalle, F_NUMERO))
+      const ancho = anchoRotulo(e)
       const izquierda = e.x + e.lado / 2 + AIRE_ROTULO
       const arriba = e.y - ALTO_ROTULO / 2
 

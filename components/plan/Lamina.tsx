@@ -11,7 +11,7 @@ import {
   type Tinta,
   LADO_TERMINAL,
 } from '@/content/red'
-import { proyectar, redondear, trazo, type Punto3D } from '@/lib/iso'
+import { proyectar, redondear, trazo, trazoRecortado, type Punto3D } from '@/lib/iso'
 import { F_NOMBRE, F_NUMERO, type RotuloColocado } from '@/lib/rotulos'
 import { CAJA_SIMBOLO, geometriaSimbolos, Simbolo, trazoSimbolo } from './simbolos'
 
@@ -55,6 +55,12 @@ const GROSOR: Record<Peso, number> = { hair: 0.5, line: 1, bold: 2 }
  */
 const HALO: Record<Peso, number> = { hair: 3, line: 5, bold: 6.5 }
 
+/**
+ * Cuánto se acorta el halo en cada extremo del tubo, para no morder la línea a
+ * la que se une. Ver `trazoRecortado`.
+ */
+const RECORTE_HALO = 7
+
 /** Halo de los símbolos, para que interrumpan el tubo que llega a ellos. */
 const HALO_SIMBOLO = 7
 
@@ -86,21 +92,30 @@ const TEXTO_TINTA: Record<Tinta, string> = {
  */
 function Tubo({ tubo, unidad }: { tubo: Red['tubos'][number]; unidad: number }) {
   const d = trazo(tubo.puntos, unidad)
-  if (d === null) return null
+  const dHalo = trazoRecortado(tubo.puntos, unidad, RECORTE_HALO)
+  if (d === null || dHalo === null) return null
 
   const comun = {
-    d,
     fill: 'none',
-    strokeLinecap: 'butt',
     strokeLinejoin: 'miter',
     vectorEffect: 'non-scaling-stroke',
   } as const
 
   return (
     <g>
-      <path {...comun} className="stroke-paper" strokeWidth={HALO[tubo.peso]} />
       <path
         {...comun}
+        d={dHalo}
+        strokeLinecap="butt"
+        className="stroke-paper"
+        strokeWidth={HALO[tubo.peso]}
+      />
+      {/* Punta cuadrada: cierra la esquina donde dos tubos se unen en ángulo,
+          que con punta a tope queda con una muesca. */}
+      <path
+        {...comun}
+        d={d}
+        strokeLinecap="square"
         id={tubo.id}
         data-seg={tubo.id}
         data-ramal={tubo.ramal ?? 'tronco'}
@@ -220,9 +235,9 @@ function TerminalCompleto({
 
       {rotulo.referencia ? (
         <line
-          x1={rotulo.x}
+          x1={redondear(rotulo.referencia.x)}
           y1={redondear(py + lado / 2)}
-          x2={rotulo.x}
+          x2={redondear(rotulo.referencia.x)}
           y2={redondear(rotulo.referencia.hastaY)}
           className="stroke-ink-300"
           strokeWidth={GROSOR.hair}
@@ -231,7 +246,7 @@ function TerminalCompleto({
       ) : null}
 
       <text
-        x={rotulo.x}
+        x={redondear(rotulo.x)}
         y={redondear(rotulo.y)}
         textAnchor={alineacion}
         className="datum fill-ink-600"
@@ -242,7 +257,7 @@ function TerminalCompleto({
       </text>
 
       <text
-        x={rotulo.x}
+        x={redondear(rotulo.x)}
         y={redondear(rotulo.y + INTERLINEA)}
         textAnchor={alineacion}
         className={`lettering ${esRojo ? RELLENO_TINTA.fire : RELLENO_TINTA['ink-900']}`}

@@ -1,6 +1,6 @@
 import { construirRed, LADO_TERMINAL, type Layout, type Peso, type Tinta } from '@/content/red'
 import { calor, extintorEn, frenteDeChorro, niebla } from '@/lib/intro'
-import { proyectar, redondear, trazo } from '@/lib/iso'
+import { proyectar, redondear, trazo, trazoRecortado } from '@/lib/iso'
 import { F_NOMBRE, F_NUMERO } from '@/lib/rotulos'
 import { CAJA_SIMBOLO, geometriaSimbolos, trazoSimbolo } from './simbolos'
 
@@ -19,6 +19,9 @@ import { CAJA_SIMBOLO, geometriaSimbolos, trazoSimbolo } from './simbolos'
 
 const GROSOR: Record<Peso, number> = { hair: 0.5, line: 1, bold: 2 }
 const HALO: Record<Peso, number> = { hair: 3, line: 5, bold: 6.5 }
+
+/** El mismo recorte de halo que usa `Lamina`. Ver `trazoRecortado`. */
+const RECORTE_HALO = 7
 
 /** Token base de cada tinta, para mezclar contra el rojo del fuego. */
 const TOKEN_BASE: Record<Tinta, string> = {
@@ -86,23 +89,31 @@ export function Fotograma({ t, layout = 'ancha', instancia, className = '' }: Fo
       {/* ── La lámina, con cada segmento a su calor ──────────── */}
       {red.tubos.map((tubo) => {
         const d = trazo(tubo.puntos, red.unidad)
-        if (d === null) return null
+        const dHalo = trazoRecortado(tubo.puntos, red.unidad, RECORTE_HALO)
+        if (d === null || dHalo === null) return null
         const { mx, my } = medio(tubo.puntos, red.unidad)
         const h = calor(t, mx, my, vb)
 
         const comun = {
-          d,
           fill: 'none',
-          strokeLinecap: 'butt',
           strokeLinejoin: 'miter',
           vectorEffect: 'non-scaling-stroke',
         } as const
 
+        // Mismo criterio que `Lamina`: halo acortado, trazo con punta cuadrada.
         return (
           <g key={tubo.id}>
-            <path {...comun} className="stroke-paper" strokeWidth={HALO[tubo.peso]} />
             <path
               {...comun}
+              d={dHalo}
+              strokeLinecap="butt"
+              className="stroke-paper"
+              strokeWidth={HALO[tubo.peso]}
+            />
+            <path
+              {...comun}
+              d={d}
+              strokeLinecap="square"
               strokeWidth={GROSOR[tubo.peso]}
               style={{ stroke: tintaCaliente(tubo.tinta, h) }}
             />
